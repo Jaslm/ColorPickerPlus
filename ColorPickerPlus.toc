@@ -1,0 +1,9 @@
+## Interface: 80000
+## Title: ColorPickerPlus
+## Notes: Hooks into the standard Color Picker to provide text entry for colors (RGB and hex values), starting color and chosen color swatches
+## Author: jaslm
+## DefaultState: Enabled
+## SavedVariables: ColorPickerPlusDB
+
+
+ColorPickerPlus.lua
