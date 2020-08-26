@@ -516,11 +516,11 @@ local function PaletteSwatchOnMouseUp (frame, button)
 						r, g, b, a = ColorPPChosenColor:GetBackdropColor()
 						frame:SetBackdropColor(r, g, b, a)
 						c.r = r; c.g = g; c.b = b; c.a = a
-					elseif IsControlKeyDown() then
-						local pc = defaults.palette[k]
-						r = pc.r; g = pc.g; b = pc.b; a = pc.a
-						frame:SetBackdropColor(r, g, b, a)
-						c.r = r; c.g = g; c.b = b; c.a = a
+--					elseif IsControlKeyDown() then
+--						local pc = defaults.palette[k]
+--						r = pc.r; g = pc.g; b = pc.b; a = pc.a
+--						frame:SetBackdropColor(r, g, b, a)
+--						c.r = r; c.g = g; c.b = b; c.a = a
 					end
 				end
 			else	-- Set the chosen color to the swatch color
@@ -1021,7 +1021,7 @@ local function ColorPPTooltipShow(self)
 		GameTooltip:AddLine("Left click on palette to use palette color")
 		if ColorPPPalette:IsVisible() then
 			GameTooltip:AddLine("Shift left click on palette to save color to palette")
-			GameTooltip:AddLine("Control left click on palette to reset a color to default")
+--			GameTooltip:AddLine("Control left click on palette to reset a color to default")
 		end
 	end
 	--GameToolTip:AddLine("Left click on old color to reset current color")
