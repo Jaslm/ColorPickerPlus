@@ -1,10 +1,10 @@
 -- ColorPickerPlus replaces the standard Color Picker to provide
--- © Jaslm 
---      1. text entry for colors (RGB, hex, and HSV values) and alpha (for opacity), 
--- 	2. copy to and paste from color palette
+-- © Jaslm
+--	1. text entry for colors (RGB, hex, and HSV values) and alpha (for opacity),
+--	2. copy to and paste from color palette
 --	3. color swatches for the copied color and for the starting color
---      4. analog color choice through a hue bar and saturation/value gradient square
---      5. class palette and copy/paste independent of palette
+--	4. analog color choice through a hue bar and saturation/value gradient square
+--	5. class palette and copy/paste independent of palette
 
 --VARIABLES
 -------------------------------------------------------------------------------------------------------
@@ -20,7 +20,7 @@ local lockedOpacity = 0  -- saves value of opacity while HueBar or Gradient chan
 
 local colorHue  -- 0 to 1
 local colorSat  -- 0 to 1
-local colorVal  -- 0 to 1 
+local colorVal  -- 0 to 1
 
 local dialogWidthNoOpacity = 380
 local dialogWidthWithOpacity = 420
@@ -31,7 +31,7 @@ local topMargin = 28
 local spacing = 12
 
 local hueBarWidth = 18
-local hueBarHeight = 300   
+local hueBarHeight = 300
 local hueTextureSize = 50  -- allow for 1/6 of hueBarHeight
 
 local opacityBarWidth = 18
@@ -42,6 +42,7 @@ local gradientHeight = 160
 
 local colorSwatchWidth = 120
 local colorSwatchHeight = 120
+local isClassic = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC) -- true if on classic server
 
 -- bgtable used in creation of backdrops
 local bgtable = {
@@ -51,11 +52,11 @@ local bgtable = {
 		tileSize = 16,
 		edgeSize = 1,
 		insets = { 0, 0, 0, 0 },
-	} 
+	}
 
 -- initial values in palette
 -- these are overridden by user and saved in WoW SavedVariables
-local defaults = {	
+local defaults = {
 	palette = {					--  36 color allotted
 		{ r = 1.0, g = 0.0, b = 0.0, a = 1.0 },	-- red
 		{ r = 1.0, g = 0.0, b = 0.5, a = 1.0 },	-- rose
@@ -64,35 +65,35 @@ local defaults = {
 		{ r = 0.0, g = 0.0, b = 1.0, a = 1.0 },	-- blue
 		{ r = 0.0, g = 0.5, b = 1.0, a = 1.0 },	-- azure
 		{ r = 0.0, g = 1.0, b = 1.0, a = 1.0 },	-- cyan
-		{ r = 0.0, g = 1.0, b = 0.5, a = 1.0 }, -- aquamarine 
-		{ r = 0.0, g = 1.0, b = 0.0, a = 1.0 }, -- green	
+		{ r = 0.0, g = 1.0, b = 0.5, a = 1.0 }, -- aquamarine
+		{ r = 0.0, g = 1.0, b = 0.0, a = 1.0 }, -- green
 		{ r = 0.5, g = 1.0, b = 0.0, a = 1.0 }, -- chartreuse
 		{ r = 1.0, g = 1.0, b = 0.0, a = 1.0 }, -- yellow
 		{ r = 1.0, g = 0.5, b = 0.0, a = 1.0 }, -- orange
 		{ r = 0.976, g = 0.549, b = 0.714, a = 1.0 },	-- pastels
-		{ r = 0.984, g = 0.714, b = 0.820, a = 1.0 },	
-		{ r = 0.647, g = 0.537, b = 0.757, a = 1.0 },	
-		{ r = 0.757, g = 0.702, b = 0.843, a = 1.0 },	
-		{ r = 0.459, g = 0.537, b = 0.749, a = 1.0 },	
-		{ r = 0.580, g = 0.659, b = 0.816, a = 1.0 },	
-		{ r = 0.604, g = 0.808, b = 0.874, a = 1.0 },	
-		{ r = 0.710, g = 0.882, b = 0.682, a = 1.0 },	
-		{ r = 0.749, g = 0.894, b = 0.462, a = 1.0 },	
-		{ r = 0.999, g = 0.980, b = 0.506, a = 1.0 },	
-		{ r = 0.992, g = 0.792, b = 0.635, a = 1.0 },	
-		{ r = 0.859, g = 0.835, b = 0.725, a = 1.0 },	
+		{ r = 0.984, g = 0.714, b = 0.820, a = 1.0 },
+		{ r = 0.647, g = 0.537, b = 0.757, a = 1.0 },
+		{ r = 0.757, g = 0.702, b = 0.843, a = 1.0 },
+		{ r = 0.459, g = 0.537, b = 0.749, a = 1.0 },
+		{ r = 0.580, g = 0.659, b = 0.816, a = 1.0 },
+		{ r = 0.604, g = 0.808, b = 0.874, a = 1.0 },
+		{ r = 0.710, g = 0.882, b = 0.682, a = 1.0 },
+		{ r = 0.749, g = 0.894, b = 0.462, a = 1.0 },
+		{ r = 0.999, g = 0.980, b = 0.506, a = 1.0 },
+		{ r = 0.992, g = 0.792, b = 0.635, a = 1.0 },
+		{ r = 0.859, g = 0.835, b = 0.725, a = 1.0 },
 		{ r = 0.0, g = 0.0, b = 0.0, a = 1.0 },  -- black
 		{ r = 0.1, g = 0.1, b = 0.1, a = 1.0 },	 -- shades of gray
-		{ r = 0.2, g = 0.2, b = 0.2, a = 1.0 },	
-		{ r = 0.3, g = 0.3, b = 0.3, a = 1.0 },	
-		{ r = 0.4, g = 0.4, b = 0.4, a = 1.0 },	
-		{ r = 0.5, g = 0.5, b = 0.5, a = 1.0 },	
-		{ r = 0.6, g = 0.6, b = 0.6, a = 1.0 },	
-		{ r = 0.7, g = 0.7, b = 0.7, a = 1.0 }, 
-		{ r = 0.8, g = 0.8, b = 0.8, a = 1.0 }, 	
-		{ r = 0.9, g = 0.9, b = 0.9, a = 1.0 }, 
+		{ r = 0.2, g = 0.2, b = 0.2, a = 1.0 },
+		{ r = 0.3, g = 0.3, b = 0.3, a = 1.0 },
+		{ r = 0.4, g = 0.4, b = 0.4, a = 1.0 },
+		{ r = 0.5, g = 0.5, b = 0.5, a = 1.0 },
+		{ r = 0.6, g = 0.6, b = 0.6, a = 1.0 },
+		{ r = 0.7, g = 0.7, b = 0.7, a = 1.0 },
+		{ r = 0.8, g = 0.8, b = 0.8, a = 1.0 },
+		{ r = 0.9, g = 0.9, b = 0.9, a = 1.0 },
 		{ r = 1.0, g = 1.0, b = 1.0, a = 1.0 }, -- white
-		{ r = 0.7, g = 0.7, b = 0.7, a = 0.7 }, -- transparent gray 
+		{ r = 0.7, g = 0.7, b = 0.7, a = 0.7 }, -- transparent gray
 	},
 	paletteState = 2,
 }
@@ -111,7 +112,7 @@ local classColorPalette = {
 		{ r = 0.58, g = 0.51, b = 0.79, a = 1.0 }, -- Warlock Purple
 		{ r = 0.78, g = 0.61, b = 0.43, a = 1.0 }, -- Warrior Tan
 	}
-	
+
 --EVENT REGISTRATION
 -------------------------------------------------------------------------------------------------------------------------
 -- these need to happen inline at lua file load time
@@ -184,9 +185,9 @@ end
 
 function MOD:GetAlpha()
 	local a
-	if ColorPickerFrame.hasOpacity then 
+	if ColorPickerFrame.hasOpacity then
 		a = 1-OpacitySliderFrame:GetValue()  -- blizzard values are reversed from expected transparency
-	else	
+	else
 		a = 1
 	end
 	return a
@@ -221,7 +222,7 @@ function MOD.ADDON_LOADED (ev, name)
 			ColorPickerPlusDB = defaults
 			DB = ColorPickerPlusDB
 		end
-	end 
+	end
 end
 
 -- functions to update thumb cursors
@@ -230,25 +231,25 @@ function MOD:UpdateGradientThumb()
 	local rx = (colorSat * gradientWidth) -- use saturation and brightness to adjust gradient selection point
 	local ry = (colorVal * gradientHeight)
 	ColorPPColorGradientThumb:ClearAllPoints()
-	
+
 	-- allow for 5 pixel border around gradient, which allows user to 'grab' thumb and move it to edge of gradient
-	if rx == 0 then rx = 5 
-	elseif rx > gradientWidth-5 then rx = rx-5 
+	if rx == 0 then rx = 5
+	elseif rx > gradientWidth-5 then rx = rx-5
 	end
 	if ry == 0 then ry = 5
 	elseif ry > gradientHeight-5 then ry = ry-5
 	end
 	ColorPPColorGradientThumb:SetPoint("CENTER", ColorPPGradient, "BOTTOMLEFT", rx, ry)
-end 
+end
 
 function MOD:UpdateOpacityBarThumb()
 	local a = OpacitySliderFrame:GetValue()
-	local ry = a*opacityBarHeight       
+	local ry = a*opacityBarHeight
 	ColorPPOpacityBarThumb:ClearAllPoints()
 	ColorPPOpacityBarThumb:SetPoint("CENTER", ColorPPOpacityBar, "BOTTOM", 0, ry)
 end
 
-function MOD:UpdateHueBarThumb() 
+function MOD:UpdateHueBarThumb()
 	local ry = colorHue*hueBarHeight
 	if colorHue < 0.5 then ry = ry + 1 else ry = ry -1 end   -- adjust for thumb position at ends of bar
 	ColorPPHueBarThumb:ClearAllPoints()
@@ -265,26 +266,26 @@ function MOD:UpdateColorGraphics()
 	print("h, s, v = ", floor(h*360), floor(s*100), floor(v*100))
 	print("alpha = ", floor(a*100))
 --]]
-	
+
 	MOD:UpdateChosenColor()
-	MOD:UpdateGradientColorOverlay()	
+	MOD:UpdateGradientColorOverlay()
 	MOD:UpdateGradientThumb()
 	MOD:UpdateHueBarThumb()
 end
 
 function MOD:ShowHideAlpha()
 	-- show/hide the alpha box and adjust related components
-	if ColorPickerFrame.hasOpacity then 
+	if ColorPickerFrame.hasOpacity then
 		OpacitySliderFrame:Hide()    -- have to do this every time
 		ColorPPOpacityBar:Show()
-		ColorPPBoxA:Show() 
-		ColorPPBoxLabelA:Show() 
+		ColorPPBoxA:Show()
+		ColorPPBoxLabelA:Show()
 		ColorPickerFrame:SetWidth(dialogWidthWithOpacity)
-		MOD:UpdateOpacityBarThumb() 
+		MOD:UpdateOpacityBarThumb()
 	else
 		ColorPPOpacityBar:Hide()
-		ColorPPBoxA:Hide() 
-		ColorPPBoxLabelA:Hide() 
+		ColorPPBoxA:Hide()
+		ColorPPBoxLabelA:Hide()
 		ColorPickerFrame:SetWidth(dialogWidthNoOpacity)
 	end
 end
@@ -293,9 +294,9 @@ function MOD:Hooked_OnShow(...)
 	local r, g, b = ColorPickerFrame:GetColorRGB()
 
 	colorHue, colorSat, colorVal = RGB_to_HSV(r,g,b) -- store HSV values in our own variables
-	
+
 	MOD:ShowHideAlpha()
-	
+
 	MOD:UpdateOldColor(r,g,b,MOD:GetAlpha())
 	MOD:UpdateColorGraphics()
 	MOD:UpdateColorTexts()
@@ -320,17 +321,23 @@ function MOD:CleanUpColorPickerFrame()
 			if v:GetText() == COLOR_PICKER then v:Hide() end
 		end
 	end
-	
-	-- Add the "Color Picker Plus" dialog title
-	ColorPickerFrame.Header:Hide()
 
-	local h = CreateFrame('Frame', nil, ColorPickerFrame, "DialogHeaderTemplate")
-	local t = h:CreateFontString(nil, "ARTWORK")
-	t:SetFontObject("GameFontNormal")
-	t:SetText("Color Picker Plus")
-	t:SetPoint("TOP", h, "TOP", 0, -14)
-	
-	-- make the color picker movable.	
+	-- Add the "Color Picker Plus" dialog title
+	if isClassic then
+		local t = ColorPickerFrame:CreateFontString(ColorPPHeaderText)
+		t:SetFontObject("GameFontNormal")
+		t:SetText("Color Picker Plus")
+		t:SetPoint("TOP", ColorPickerFrameHeader, "TOP", 0, -14)
+	else
+		ColorPickerFrame.Header:Hide()
+		local h = CreateFrame('Frame', "ColorPPHeaderTitle", ColorPickerFrame, "DialogHeaderTemplate")
+		local t = h:CreateFontString(nil, "ARTWORK")
+		t:SetFontObject("GameFontNormal")
+		t:SetText("Color Picker Plus")
+		t:SetPoint("TOP", h, "TOP", 0, -14)
+	end
+
+	-- make the color picker movable.
 	local mover = CreateFrame('Frame', nil, ColorPickerFrame)
 	mover:SetPoint('TOPLEFT', ColorPickerFrame, 'TOP', -60, 0)
 	mover:SetPoint('BOTTOMRIGHT', ColorPickerFrame, 'TOP', 60, -15)
@@ -381,12 +388,12 @@ end
 
 local function ChosenColorOnMouseUp (frame, button)
 	if frame:IsMouseOver() and button == "LeftButton" and IsControlKeyDown() then
-		
+
 		local r, g, b, a = frame:GetBackdropColor()
-		
+
 		-- print chosen color in [0-1] RGB to the chat window
 		print("ColorPickerPlus color in [0-1] RGB: r = ", string.format("%.3f", r), " g = ", string.format("%.3f", g), " b = ", string.format("%.3f", b))
-		
+
 	end
 end
 
@@ -422,17 +429,17 @@ function MOD:CreateColorSwatches()
 end
 
 function MOD:CreateCopyPasteArea()
-	
+
 	-- create frame for buttons and copiedColorSwatch
 	fr = CreateFrame("Frame", "ColorPPCopyPasteArea", ColorPPPaletteFrame, BackdropTemplateMixin and "BackdropTemplate")
 	fr:SetBackdrop(bgtable)
 	fr:SetSize(gradientWidth-10, gradientHeight-10)
 	fr:ClearAllPoints()
-	fr:SetPoint ("CENTER", ColorPPPaletteFrame, "CENTER", 0, 0) 
+	fr:SetPoint ("CENTER", ColorPPPaletteFrame, "CENTER", 0, 0)
 	fr:SetBackdropColor(0.4,0.4,0.4,0)
 	fr:SetBackdropBorderColor(0.4, 0.4, 0.4, 0)
 	fr:Show()
-	
+
 	-- Create copiedColorSwatch
 	local f = CreateFrame("Frame", "ColorPPCopiedColor", fr, BackdropTemplateMixin and "BackdropTemplate")
 	local x = colorSwatchHeight*0.65
@@ -444,7 +451,7 @@ function MOD:CreateCopyPasteArea()
 	f:ClearAllPoints()
 	f:SetPoint("LEFT", fr, "LEFT", 0, 0)
 	f:SetPoint("BOTTOM", fr, "BOTTOM", 0, 0)
-	
+
 	-- create label for buffer swatch
 --	local t = fr:CreateFontString(fr)
 --	t:SetFontObject("GameFontNormal")
@@ -453,7 +460,7 @@ function MOD:CreateCopyPasteArea()
 --	t:SetPoint("BOTTOM", ColorPPCopiedColor, "TOP", 0, 5)
 --	t:Show()
 
-	
+
 	-- add copy button
 	local b = CreateFrame("Button", "ColorPPCopy", fr, "UIPanelButtonTemplate")
 	b:SetText("<-- Copy")
@@ -461,11 +468,11 @@ function MOD:CreateCopyPasteArea()
 	b:SetHeight("22")
 	b:SetScale(0.80)
 	b:SetPoint("TOP", "ColorPPCopiedColor", "TOP", 0, -20)
-	b:SetPoint("RIGHT", "ColorPPCopyPasteArea", "RIGHT", 0, 0) 
+	b:SetPoint("RIGHT", "ColorPPCopyPasteArea", "RIGHT", 0, 0)
 
 	-- copy color into buffer on button click
-	b:SetScript("OnClick", function(self) 
-	
+	b:SetScript("OnClick", function(self)
+
 		-- copy current dialog colors into buffer
 		local r, g, b = ColorPickerFrame:GetColorRGB()
 		local a = MOD:GetAlpha()
@@ -474,9 +481,9 @@ function MOD:CreateCopyPasteArea()
 		ColorPPPaste:Enable()
 	end
 	)
-	
-		
-	-- add paste button to the ColorPickerFrame		
+
+
+	-- add paste button to the ColorPickerFrame
 	b = CreateFrame("Button", "ColorPPPaste", fr, "UIPanelButtonTemplate")
 	b:SetText("Paste -->")
 	b:SetWidth("80")
@@ -484,7 +491,7 @@ function MOD:CreateCopyPasteArea()
 	b:SetScale(0.8)
 	b:SetPoint("TOPRIGHT", "ColorPPCopy", "BOTTOMRIGHT", 0, -10)
 	b:Disable()  -- enable when something has been copied
-	
+
 	-- paste color on button click, updating frame components
 	b:SetScript("OnClick", function(self)
 		local r, g, b, a = ColorPPCopiedColor:GetBackdropColor()
@@ -498,7 +505,7 @@ function MOD:CreateCopyPasteArea()
 		MOD:UpdateColorGraphics()
 		MOD:UpdateColorTexts()
 		MOD:UpdateAlphaText()
-		
+
 	end)
 
 end
@@ -543,12 +550,12 @@ function MOD:CreatePalette()
 	fr:SetBackdrop(bgtable)
 	fr:SetSize((cols*swatchSize)+((cols-1)*spacer)+(2*margin), (rows*swatchSize)+((rows-1)*spacer)+(2*margin))
 	fr:ClearAllPoints()
-	fr:SetPoint ("CENTER", ColorPPPaletteFrame, "CENTER", 0, 0)  
+	fr:SetPoint ("CENTER", ColorPPPaletteFrame, "CENTER", 0, 0)
 	fr:SetPoint ("BOTTOM", ColorPPPaletteFrame, "BOTTOM", 0, 0)
 	fr:SetBackdropColor(0.4,0.4,0.4,0)
 	fr:SetBackdropBorderColor(0.4, 0.4, 0.4, 0)
 	fr:Show()
-	
+
 	-- Create Palette Swatches
 	local i, j, k = 0, 0, 0
 	for j = 1, rows do
@@ -591,7 +598,7 @@ end
 function MOD:CreateClassPalette()
 
 	local rows = 3
-	local cols = 4  
+	local cols = 4
 	local spacer = 2
 	local margin = 0
 	local swatchSize = 20
@@ -601,11 +608,11 @@ function MOD:CreateClassPalette()
 	fr:SetBackdrop(bgtable)
 	fr:SetSize((cols*swatchSize)+((cols-1)*spacer)+(2*margin), (rows*swatchSize)+((rows-1)*spacer)+(2*margin))
 	fr:ClearAllPoints()
-	fr:SetPoint ("CENTER", ColorPPPaletteFrame, "CENTER", 0, -5)  
+	fr:SetPoint ("CENTER", ColorPPPaletteFrame, "CENTER", 0, -5)
 	fr:SetBackdropColor(0.4,0.4,0.4,0)
 	fr:SetBackdropBorderColor(0.4, 0.4, 0.4, 0)
 	fr:Show()
-	
+
 	-- create label for frame
 	local t = fr:CreateFontString(fr)
 	t:SetFontObject("GameFontNormal")
@@ -613,7 +620,7 @@ function MOD:CreateClassPalette()
 	t:SetTextColor(1,1,1,1)
 	t:SetPoint("BOTTOM", fr, "TOP", 0, 5)
 	t:Show()
-	
+
 	-- Create Palette Swatches
 	local i, j, k = 0, 0, 0
 	for j = 1, rows do
@@ -638,7 +645,7 @@ end
 
 
 local function GradientOnMouseDown(self, button)
-	if self:IsMouseOver() and IsMouseButtonDown(LeftButton) then 
+	if self:IsMouseOver() and IsMouseButtonDown(LeftButton) then
 		if not (lockedHueBar or lockedOpacityBar) then
 			lockedGradient = true
 			if ColorPickerFrame.hasOpacity then lockedOpacity = 1-OpacitySliderFrame:GetValue() else lockedOpacity = 1 end
@@ -653,9 +660,9 @@ local function GradientOnUpdate(self)
 		if (lockedHueBar or lockedOpacityBar) then return end
 
 		if lockedGradient then  -- begin to track motion, until button release
-		
+
 			local brightness, saturation
-	
+
 			-- Get the bounds of the frame and account for any Scale settings
 			-- note that position is within 5 pixel border on each side
 			local scale = ColorPickerFrame:GetScale()	-- We inherit scale from our "parent" the ColorPickerFrame
@@ -674,10 +681,10 @@ local function GradientOnUpdate(self)
 
 			local mousePosX = right - x
 			local mousePosY = top - y
-			
+
 			if (y < bottom) then  colorVal = 0
-			elseif (y > top) then colorVal = 1 
-			else 
+			elseif (y > top) then colorVal = 1
+			else
 				colorVal = 1-(mousePosY / height)
 				if colorVal < 0 then colorVal = 0 end
 			end
@@ -688,7 +695,7 @@ local function GradientOnUpdate(self)
 				colorSat = 1-(mousePosX / width)
 				if colorSat < 0 then colorSat = 0 end
 			end
-						
+
 			local r, g, b = HSV_to_RGB(colorHue, colorSat, colorVal)
 
 			ColorPickerFrame:SetColorRGB(r, g, b)
@@ -702,33 +709,33 @@ local function GradientOnUpdate(self)
 		lockedGradient = false
 		lockedHueBar = false
 		lockedOpacityBar = false
-	end	
+	end
 end
 
 function MOD:CreateColorGradient()  -- allows selection of saturation/value
 
 	local f = CreateFrame("Frame", "ColorPPGradient", ColorPickerFrame)
-	f:SetSize(gradientWidth, gradientHeight) 
+	f:SetSize(gradientWidth, gradientHeight)
 	f:SetPoint("TOPLEFT", ColorPPHueBar, "TOPRIGHT", spacing, 5)
 	f:EnableMouse(true)
 	f:SetScript("OnMouseDown", GradientOnMouseDown)
-	f:SetScript("OnUpdate", GradientOnUpdate) 
+	f:SetScript("OnUpdate", GradientOnUpdate)
 
-	-- add Color Gradient 
+	-- add Color Gradient
 	local t = f:CreateTexture("ColorPPGradientTexture")
 	t:SetSize(gradientWidth-10, gradientHeight-10)
 	t:SetTexture("Interface\\AddOns\\ColorPickerPlus\\media\\color_gradient")
 	t:SetPoint("CENTER", ColorPPGradient, "CENTER", 0, 0)
 	t:Show()
-	
-	-- add Color Overlay 
+
+	-- add Color Overlay
 	t = f:CreateTexture("ColorPPColorOverlay")
 	t:SetSize(gradientWidth-10, gradientHeight-10)
 	t:SetDrawLayer("OVERLAY", 0)
 	t:SetTexture("Interface\\AddOns\\ColorPickerPlus\\media\\color_overlay")
 	t:SetPoint("CENTER", ColorPPGradient, "CENTER", 0, 0)
 	t:Show()
-	
+
 	-- add gradient thumb texture
 	t = f:CreateTexture("ColorPPColorGradientThumb")
 	t:SetSize(10, 10)
@@ -743,7 +750,7 @@ end
 
 
 local function HueBarOnMouseDown(self, button)
-	if self:IsMouseOver() and IsMouseButtonDown(LeftButton) then 
+	if self:IsMouseOver() and IsMouseButtonDown(LeftButton) then
 		if not (lockedGradient or lockedOpacityBar) then
 			lockedHueBar = true
 			if ColorPickerFrame.hasOpacity then lockedOpacity = 1-OpacitySliderFrame:GetValue() else lockedOpacity = 1 end
@@ -754,16 +761,16 @@ end
 
 local function HueBarOnUpdate(self)  -- it's actually the holder that receives this call
 
-	if IsMouseButtonDown(LeftButton) then 
-	
+	if IsMouseButtonDown(LeftButton) then
+
 		if (lockedGradient or lockedOpacityBar) then return end
-	
+
 		if lockedHueBar then  -- tracking mouse in or out of bar
 
 			local fr = ColorPPHueBar
-			
+
 			-- Get the bounds of the frame and account for any Scale settings
-			local scale = ColorPickerFrame:GetScale()	
+			local scale = ColorPickerFrame:GetScale()
 			local top = fr:GetTop() * scale
 			local bottom = fr:GetBottom() * scale
 			local left = fr:GetLeft() * scale
@@ -777,17 +784,17 @@ local function HueBarOnUpdate(self)  -- it's actually the holder that receives t
 			y = y / uiscale
 
 			if (y < bottom) then  colorHue = 1
-				elseif (y > top) then colorHue = 0 
-				else colorHue = (top-y) / height 
+				elseif (y > top) then colorHue = 0
+				else colorHue = (top-y) / height
 			end
-			
+
 			local r, g, b = HSV_to_RGB(colorHue,colorSat,colorVal)
- 			ColorPickerFrame:SetColorRGB(r, g, b)	
+ 			ColorPickerFrame:SetColorRGB(r, g, b)
 			ColorPickerFrame.func()
 			MOD:UpdateColorTexts()
-			ColorPPChosenColor:SetBackdropColor(r, g, b, lockedOpacity) 
+			ColorPPChosenColor:SetBackdropColor(r, g, b, lockedOpacity)
 			ColorPPColorOverlay:SetVertexColor(HSV_to_RGB(colorHue,1,1))
-			MOD:UpdateHueBarThumb()			
+			MOD:UpdateHueBarThumb()
 
 		end
 
@@ -805,14 +812,14 @@ function MOD:CreateHueBar()
 
 	local fh = CreateFrame("Frame", "ColorPPHueBarHolder", ColorPickerFrame)
 	fh:SetSize(hueBarWidth+6, hueBarHeight+8)
-	fh:SetPoint("TOPLEFT", ColorPickerFrame, "TOPLEFT", sideMargin, -topMargin)  
+	fh:SetPoint("TOPLEFT", ColorPickerFrame, "TOPLEFT", sideMargin, -topMargin)
 	local f = CreateFrame("Frame", "ColorPPHueBar", fh)
 	f:SetSize(hueBarWidth, hueBarHeight)
-	f:SetPoint("CENTER", fh, "CENTER")  
+	f:SetPoint("CENTER", fh, "CENTER")
 	fh:EnableMouse(true)
 	fh:SetScript("OnUpdate", HueBarOnUpdate)
 	fh:SetScript("OnMouseDown", HueBarOnMouseDown)
-	
+
 	local color = {
 		{ r = 1.0, g = 0.0, b = 0.0 },	-- Red
 		{ r = 1.0, g = 1.0, b = 0.0 },	-- Yellow
@@ -825,14 +832,14 @@ function MOD:CreateHueBar()
 
 	for i = 1, 6 do
 		local t = f:CreateTexture("ColorPPHue"..tostring(i), ColorPPHueBar)
-		if i == 1 then t:SetPoint("TOP", ColorPPHueBar, "TOP", 0, 0) 
+		if i == 1 then t:SetPoint("TOP", ColorPPHueBar, "TOP", 0, 0)
 			else t:SetPoint("TOP", "ColorPPHue"..tostring(i-1), "BOTTOM", 0, 0) end
 		t:SetSize(hueBarWidth, hueTextureSize)
 		t:SetVertexColor(1.0, 1.0, 1.0, 1.0)
 		t:SetColorTexture(1.0, 1.0, 1.0, 1.0)
 		t:SetGradient("VERTICAL",  color[i+1].r, color[i+1].g, color[i+1].b, color[i].r, color[i].g, color[i].b )
 	end
-	
+
 	-- Thumb indicates value position on the slider
 	local thumb = f:CreateTexture("ColorPPHueBarThumb", fh)
 	thumb:SetTexture("Interface\\AddOns\\ColorPickerPlus\\Media\\SliderVBar.tga", false)
@@ -843,7 +850,7 @@ end
 
 
 local function OpacityBarOnMouseDown(self, button)
-	if (self:IsMouseOver() and IsMouseButtonDown(LeftButton)) then 
+	if (self:IsMouseOver() and IsMouseButtonDown(LeftButton)) then
 		if not (lockedHueBar or lockedGradient) then
 			lockedOpacityBar = true
 			MOD:UpdateOpacityBarThumb()
@@ -853,10 +860,10 @@ end
 
 local function OpacityBarOnUpdate(self)
 
-	if IsMouseButtonDown(LeftButton) then 
+	if IsMouseButtonDown(LeftButton) then
 		if (lockedGradient or lockedHueBar) then return end
 		if lockedOpacityBar then  -- tracking mouse in or out of bar
-		
+
 			-- Get the bounds of the frame and account for any Scale settings
 			local scale = ColorPickerFrame:GetScale()	-- We inherit scale from our "parent" the ColorPickerFrame
 			local top = self:GetTop() * scale
@@ -864,7 +871,7 @@ local function OpacityBarOnUpdate(self)
 			local left = self:GetLeft() * scale
 			local right = self:GetRight() * scale
 			local height = top - bottom
-			
+
 			-- Get the cursor position and account for any UI Scale settings
 			local uiscale = UIParent:GetEffectiveScale()
 			local x, y = GetCursorPosition()
@@ -877,11 +884,11 @@ local function OpacityBarOnUpdate(self)
 				else
 					a = 1-((top-y) / height)
 			end
-			
+
 		OpacitySliderFrame:SetValue(a)  -- blizzard reverse alpha
 		MOD:UpdateAlphaText()
 		local r, g, b = ColorPickerFrame:GetColorRGB()
-		ColorPPChosenColor:SetBackdropColor(r, g, b, 1-a) 
+		ColorPPChosenColor:SetBackdropColor(r, g, b, 1-a)
 		end
 	else
 		lockedGradient = false
@@ -892,22 +899,22 @@ local function OpacityBarOnUpdate(self)
 end
 
 function MOD:CreateOpacityBar()
-	
+
 	local f = CreateFrame("Frame", "ColorPPOpacityBar", ColorPickerFrame)
 	f:SetSize(opacityBarWidth, opacityBarHeight)
-	f:SetPoint("TOP", ColorPickerFrame, "TOP", 0, -topMargin)  
+	f:SetPoint("TOP", ColorPickerFrame, "TOP", 0, -topMargin)
 	f:EnableMouse(true)
 	f:SetScript("OnUpdate", OpacityBarOnUpdate)
 	f:SetScript("OnMouseDown", OpacityBarOnMouseDown)
 
-	
+
 	local t = f:CreateTexture("ColorPPOpacityBarBG", f)
-	t:SetPoint("TOP", ColorPPOpacityBar, "TOP", 0, 0)  
+	t:SetPoint("TOP", ColorPPOpacityBar, "TOP", 0, 0)
 	t:SetSize(opacityBarWidth, opacityBarHeight)
 	t:SetVertexColor(1.0, 1.0, 1.0, 1.0)
 	t:SetColorTexture(1.0, 1.0, 1.0, 1.0)
 	t:SetGradient("VERTICAL",  1, 1, 1, 0, 0, 0 )
-	
+
  	-- Thumb indicates value position on the slider
 	local thumb = f:CreateTexture("ColorPPOpacityBarThumb", f)
 	thumb:SetTexture("Interface\\AddOns\\ColorPickerPlus\\Media\\SliderVBar.tga", false)
@@ -915,7 +922,7 @@ function MOD:CreateOpacityBar()
 	thumb:SetSize(opacityBarWidth+6, 8)
 	thumb:SetDrawLayer("OVERLAY", 4)
 	thumb:SetPoint("CENTER", f, "CENTER", 0, 0)
-	
+
 	f:ClearAllPoints()
 	f:SetPoint("TOP", ColorPPHueBar, "TOP", 0, 0)
 	f:SetPoint("RIGHT", "ColorPickerFrame", "RIGHT", -sideMargin, 0)
@@ -923,9 +930,9 @@ end
 
 function MOD:CreateTextBoxes()
 	-- set up edit box frames and interior label and text areas
-	local boxes = { "R", "G", "B", "X", "H", "S", "V", "A"}	
+	local boxes = { "R", "G", "B", "X", "H", "S", "V", "A"}
 	for i = 1, table.getn(boxes) do
-	
+
 		local rgb = boxes[i]
 		--local box = CreateFrame("EditBox", "ColorPPBox"..rgb, ColorPickerFrame, "InputBoxTemplate")
 		local box = CreateFrame("EditBox", "ColorPPBox"..rgb, ColorPickerFrame, BackdropTemplateMixin and "BackdropTemplate")
@@ -951,16 +958,16 @@ function MOD:CreateTextBoxes()
 			box:SetWidth(38)
 			box:SetNumeric(true)
 		end
-	
+
 		-- label
 		local label = box:CreateFontString("ColorPPBoxLabel"..rgb, "ARTWORK", "GameFontNormalSmall")
 		label:SetTextColor(1, 1, 1, 1)
 		label:SetPoint("LEFT", "ColorPPBox"..rgb, "LEFT", -14, 0)
 		if i == 4 then label:SetText("#") else label:SetText(rgb) end
-			
+
 		-- set up scripts to handle event appropriately
 		if i == 8 then
-			box:SetScript("OnTextChanged", function(self, userInput) MOD:AlphaTextChanged(self, userInput) end)	
+			box:SetScript("OnTextChanged", function(self, userInput) MOD:AlphaTextChanged(self, userInput) end)
 		elseif i < 4 then
 			box:SetScript("OnTextChanged", function(self, userInput) MOD:RGBTextChanged(self, userInput) end)
 		elseif i == 4 then
@@ -970,7 +977,7 @@ function MOD:CreateTextBoxes()
 		end
 
 		box:SetScript("OnEditFocusGained", function(self) self:SetCursorPosition(0) self:HighlightText() end)
-		box:SetScript("OnEditFocusLost", function(self)	self:HighlightText(0,0) end)	
+		box:SetScript("OnEditFocusLost", function(self)	self:HighlightText(0,0) end)
 		box:SetScript("OnTextSet", function(self) self:ClearFocus() end)	-- otherwise cursor left blinking
 		box:Show()
 	end
@@ -980,7 +987,7 @@ function MOD:CreateTextBoxes()
 	ColorPPBoxG:SetPoint("TOPLEFT", "ColorPPBoxR", "BOTTOMLEFT", 0, -2)
 	ColorPPBoxB:SetPoint("TOPLEFT", "ColorPPBoxG", "BOTTOMLEFT", 0, -2)
 	ColorPPBoxX:SetPoint("TOPLEFT", "ColorPPBoxB", "BOTTOMLEFT", 0, -10)
-	
+
 	ColorPPBoxV:SetPoint("BOTTOMLEFT", "ColorPPGradient", "BOTTOMRIGHT", spacing*2, 5)
 	ColorPPBoxS:SetPoint("BOTTOMLEFT", "ColorPPBoxV", "TOPLEFT", 0, 2)
 	ColorPPBoxH:SetPoint("BOTTOMLEFT", "ColorPPBoxS", "TOPLEFT", 0, 2)
@@ -988,12 +995,12 @@ function MOD:CreateTextBoxes()
 	ColorPPBoxA:ClearAllPoints()
 	ColorPPBoxA:SetPoint("RIGHT", ColorPPOpacityBar, "LEFT", -spacing, 0)
 	ColorPPBoxA:SetPoint("TOP", ColorPPBoxR, "TOP")
-	
+
 		-- define the order of tab cursor movement
 	ColorPPBoxR:SetScript("OnTabPressed", function(self) ColorPPBoxG:SetFocus() end)
 	ColorPPBoxG:SetScript("OnTabPressed", function(self) ColorPPBoxB:SetFocus()  end)
 	ColorPPBoxB:SetScript("OnTabPressed", function(self) ColorPPBoxR:SetFocus()  end)
-	
+
 		-- define the order of tab cursor movement
 	ColorPPBoxH:SetScript("OnTabPressed", function(self) ColorPPBoxS:SetFocus() end)
 	ColorPPBoxS:SetScript("OnTabPressed", function(self) ColorPPBoxV:SetFocus()  end)
@@ -1008,7 +1015,7 @@ local function ColorPPTooltipShow(self)
 	GameTooltip:AddLine(" ")
 	if ColorPPCopyPasteArea:IsVisible() then
 		GameTooltip:AddLine("Copy into or paste from buffer")
-	else 
+	else
 		GameTooltip:AddLine("Left click on palette to use palette color")
 		if ColorPPPalette:IsVisible() then
 			GameTooltip:AddLine("Shift left click on palette to save color to palette")
@@ -1041,14 +1048,14 @@ end
 
 function MOD:CreatePaletteFrame()  -- sits below the color gradient box, holds various palettes
 	local fr = CreateFrame("Frame", "ColorPPPaletteFrame", ColorPickerFrame)
-	fr:SetSize(gradientWidth-10, gradientHeight -10) 
+	fr:SetSize(gradientWidth-10, gradientHeight -10)
 	fr:SetPoint("CENTER", ColorPPGradient, "CENTER", 0, 0)
 	fr:SetPoint("BOTTOM", ColorPPHueBar, "BOTTOM", 0, 0)
 end
 
 local function ColorPPSwitchPalettes(self)
 	-- 0 - full palette, 1 - class color palette, 2 - copy/paste area
-	if DB.paletteState == 0 then	
+	if DB.paletteState == 0 then
 		ColorPPPalette:Hide()
 		ColorPPClassPalette:Show()
 		DB.paletteState = 1
@@ -1061,7 +1068,7 @@ local function ColorPPSwitchPalettes(self)
 		ColorPPCopyPasteArea:Hide()
 		ColorPPPalette:Show()
 		DB.paletteState = 0
-	end	
+	end
 end
 
 function MOD:CreatePaletteSwitcher()
@@ -1087,7 +1094,7 @@ function MOD:Initialize_UI()
 	MOD:CreatePalette()
 	MOD:CreateClassPalette()
 	MOD:CreateCopyPasteArea()
-	if DB.paletteState == 0 then 
+	if DB.paletteState == 0 then
 	   ColorPPClassPalette:Hide()
 	   ColorPPCopyPasteArea:Hide()
 	elseif DB.paletteState == 1 then
@@ -1096,9 +1103,9 @@ function MOD:Initialize_UI()
 	else  -- DB.paletteState == 2
 		ColorPPPalette:Hide()
 		ColorPPClassPalette:Hide()
-	end 
+	end
 	-- print ("on initialization, ps= ", DB.paletteState)
-	MOD:CreateOpacityBar()	
+	MOD:CreateOpacityBar()
 	MOD:CreateTextBoxes()
 	MOD:CreateColorSwatches()
 	MOD:CreateHelpFrame()
@@ -1106,7 +1113,7 @@ function MOD:Initialize_UI()
 
 end
 
-function MOD.PLAYER_LOGIN()     
+function MOD.PLAYER_LOGIN()
 	ColorPickerFrame:HookScript("OnShow", function(...) MOD:Hooked_OnShow(...) end)
 	MOD:Initialize_UI()
 	ColorPickerFrame:UnregisterEvent("PLAYER_LOGIN")  --so initialization only happens once
@@ -1115,8 +1122,8 @@ end
 function MOD:RGBTextChanged(tbox, userInput)
 
 	if not userInput then return end
-	
-	local r, g, b = ColorPickerFrame:GetColorRGB() 
+
+	local r, g, b = ColorPickerFrame:GetColorRGB()
 	local sr, sg, sb = r, g, b -- save values for recovery after bad entry
 
 	local id = tbox:GetID()
@@ -1138,23 +1145,23 @@ function MOD:RGBTextChanged(tbox, userInput)
 	else return end
 
 
-	ColorPickerFrame:SetColorRGB(r, g, b) 
+	ColorPickerFrame:SetColorRGB(r, g, b)
 	ColorPickerFrame.func()
 	MOD:UpdateHSVfromColorPickerRGB()
 	MOD:UpdateColorGraphics()
-	MOD:UpdateHSVTexts() 
+	MOD:UpdateHSVTexts()
 	MOD:UpdateHexText()
-	
+
 end
 
 function MOD:HexTextChanged(tbox, userInput)
 
 	if not userInput then return end
-	
-	local r, g, b = ColorPickerFrame:GetColorRGB() 
+
+	local r, g, b = ColorPickerFrame:GetColorRGB()
 	local sr, sg, sb = r, g, b -- save values for recovery after bad entry
-	
-	if tbox:GetNumLetters() == 6 then 
+
+	if tbox:GetNumLetters() == 6 then
 			local rgb = tbox:GetText()
 			r, g, b = tonumber('0x'..strsub(rgb, 0, 2)), tonumber('0x'..strsub(rgb, 3, 4)), tonumber('0x'..strsub(rgb, 5, 6))
 			if not r then r = 0 else r = r/255 end
@@ -1162,19 +1169,19 @@ function MOD:HexTextChanged(tbox, userInput)
 			if not b then b = 0 else b = b/255 end
 	else return	end
 
-	ColorPickerFrame:SetColorRGB(r, g, b) 
+	ColorPickerFrame:SetColorRGB(r, g, b)
 	ColorPickerFrame.func()
 	MOD:UpdateHSVfromColorPickerRGB()
 	MOD:UpdateColorGraphics()
-	MOD:UpdateHSVTexts() 
+	MOD:UpdateHSVTexts()
 	MOD:UpdateRGBTexts()
-	
+
 end
 
 function MOD:HSVTextChanged(tbox, userInput)
 
 	if not userInput then return end
-	
+
 	local h, s, v = colorHue, colorSat, colorVal
 
 	local id = tbox:GetID()
@@ -1194,18 +1201,18 @@ function MOD:HSVTextChanged(tbox, userInput)
 		if v > 100 then tbox:SetText(string.format("%d", floor(colorVal*100))) return end
 		v = v/100
 	else return	end
-	
+
 	colorHue, colorSat, colorVal = h, s, v
 	local r, g, b = HSV_to_RGB(h,s,v)
-	ColorPickerFrame:SetColorRGB(r, g, b) 
+	ColorPickerFrame:SetColorRGB(r, g, b)
 	ColorPickerFrame.func()
 	MOD:UpdateColorGraphics()
 	MOD:UpdateRGBTexts()
 	MOD:UpdateHexText()
-	
+
 end
 
-function MOD:UpdateColorTexts()   
+function MOD:UpdateColorTexts()
 	MOD:UpdateRGBTexts()
 	MOD:UpdateHexText()
 	MOD:UpdateHSVTexts()
@@ -1213,11 +1220,11 @@ end
 
 function MOD:UpdateHSVTexts(h, s, v)
 	if not h then h, s, v = colorHue, colorSat, colorVal end
-	
+
 	h = math.floor (h*360 + 0.5)
 	s = math.floor (s*100 + 0.5)
 	v = math.floor (v*100 + 0.5)
-	
+
     ColorPPBoxH:SetText(string.format("%d", h))
     ColorPPBoxS:SetText(string.format("%d", s))
     ColorPPBoxV:SetText(string.format("%d", v))
@@ -1225,11 +1232,11 @@ end
 
 function MOD:UpdateRGBTexts(r, g, b)
 	if not r then r, g, b = ColorPickerFrame:GetColorRGB() end
-	
+
 	r = math.floor (r*255 + 0.5)
 	g = math.floor (g*255 + 0.5)
 	b = math.floor (b*255 + 0.5)
-	
+
     ColorPPBoxR:SetText(string.format("%d", r))
     ColorPPBoxG:SetText(string.format("%d", g))
     ColorPPBoxB:SetText(string.format("%d", b))
@@ -1237,19 +1244,19 @@ end
 
 function MOD:UpdateHexText(r, g, b)
 	if not r then r, g, b = ColorPickerFrame:GetColorRGB() end
-	
+
 	r = math.floor (r*255 + 0.5)
 	g = math.floor (g*255 + 0.5)
 	b = math.floor (b*255 + 0.5)
-	
+
 	ColorPPBoxX:SetText(string.format("%.2x", r)..string.format("%.2x",g)..string.format("%.2x", b))
 end
 
 function MOD:AlphaTextChanged(tbox, userInput)
 	if not userInput then return end -- we take care of updating elsewhere
 	local a = tbox:GetNumber()
-	if a > 100 then 
-		a = 100 
+	if a > 100 then
+		a = 100
 		ColorPPBoxA:SetText(string.format("%d", a))
 	end
 	a = a / 100
@@ -1266,4 +1273,3 @@ function MOD:UpdateAlphaText()
 	ColorPPBoxA:SetText(string.format("%d", a))
 	MOD:UpdateOpacityBarThumb()
 end
-
