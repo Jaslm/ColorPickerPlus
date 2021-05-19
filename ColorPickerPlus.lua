@@ -42,7 +42,8 @@ local gradientHeight = 160
 
 local colorSwatchWidth = 120
 local colorSwatchHeight = 120
-local isClassic = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC) -- true if on classic server
+-- local isClassic = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC) -- true if on classic server
+local isClassic = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC) or (WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC)
 
 -- bgtable used in creation of backdrops
 local bgtable = {
