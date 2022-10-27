@@ -43,7 +43,8 @@ local gradientHeight = 160
 local colorSwatchWidth = 120
 local colorSwatchHeight = 120
 -- local isClassic = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC) -- true if on classic server
-local isClassic = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC) or (WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC) or (WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC)
+local isClassic = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC) or (WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC)
+local isDragonflight = floor(select(4, GetBuildInfo()) / 10000) == 10
 
 -- bgtable used in creation of backdrops
 local bgtable = {
@@ -103,6 +104,7 @@ local classColorPalette = {
 		{ r = 0.77, g = 0.12, b = 0.23, a = 1.0 }, -- Death Knight red
 		{ r = 0.64, g = 0.19, b = 0.79, a = 1.0 }, -- Demon Hunter Magenta
 		{ r = 1.00, g = 0.49, b = 0.04, a = 1.0 }, -- Druid Orange
+		{ r = 0.20, g = 0.57, b = 0.50, a = 1.0 }, -- Evoker Green
 		{ r = 0.67, g = 0.83, b = 0.45, a = 1.0 }, -- Hunter Green
 		{ r = 0.41, g = 0.80, b = 0.94, a = 1.0 }, -- Mage Blue
 		{ r = 0.00, g = 1.00, b = 0.59, a = 1.0 }, -- Monk Green
@@ -325,14 +327,14 @@ function MOD:CleanUpColorPickerFrame()
 
 	-- Add the "Color Picker Plus" dialog title
 	if isClassic then
-		local t = ColorPickerFrame:CreateFontString(ColorPPHeaderText)
+		local t = ColorPickerFrame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
 		t:SetFontObject("GameFontNormal")
 		t:SetText("Color Picker Plus")
 		t:SetPoint("TOP", ColorPickerFrameHeader, "TOP", 0, -14)
 	else
 		ColorPickerFrame.Header:Hide()
 		local h = CreateFrame('Frame', "ColorPPHeaderTitle", ColorPickerFrame, "DialogHeaderTemplate")
-		local t = h:CreateFontString(nil, "ARTWORK")
+		local t = h:CreateFontString(nil, "ARTWORK", "GameFontNormal")
 		t:SetFontObject("GameFontNormal")
 		t:SetText("Color Picker Plus")
 		t:SetPoint("TOP", h, "TOP", 0, -14)
@@ -615,7 +617,7 @@ function MOD:CreateClassPalette()
 	fr:Show()
 
 	-- create label for frame
-	local t = fr:CreateFontString(fr)
+	local t = fr:CreateFontString(nil, "ARTWORK", "GameFontNormal")
 	t:SetFontObject("GameFontNormal")
 	t:SetText("Class Colors")
 	t:SetTextColor(1,1,1,1)
@@ -832,17 +834,24 @@ function MOD:CreateHueBar()
 	}
 
 	for i = 1, 6 do
-		local t = f:CreateTexture("ColorPPHue"..tostring(i), ColorPPHueBar)
-		if i == 1 then t:SetPoint("TOP", ColorPPHueBar, "TOP", 0, 0)
-			else t:SetPoint("TOP", "ColorPPHue"..tostring(i-1), "BOTTOM", 0, 0) end
+		local t = f:CreateTexture("ColorPPHue"..tostring(i)) --ColorPPHueBar:GetDrawLayer())
+		if i == 1 then 
+            t:SetPoint("TOP", ColorPPHueBar, "TOP", 0, 0)
+        else 
+            t:SetPoint("TOP", "ColorPPHue"..tostring(i-1), "BOTTOM", 0, 0) 
+        end
 		t:SetSize(hueBarWidth, hueTextureSize)
 		t:SetVertexColor(1.0, 1.0, 1.0, 1.0)
 		t:SetColorTexture(1.0, 1.0, 1.0, 1.0)
-		t:SetGradient("VERTICAL",  color[i+1].r, color[i+1].g, color[i+1].b, color[i].r, color[i].g, color[i].b )
+        if isDragonflight then
+            t:SetGradient("VERTICAL", CreateColor(color[i+1].r, color[i+1].g, color[i+1].b, 1), CreateColor(color[i].r, color[i].g, color[i].b, 1) )
+        else
+            t:SetGradient("VERTICAL",  color[i+1].r, color[i+1].g, color[i+1].b, color[i].r, color[i].g, color[i].b )
+        end
 	end
 
 	-- Thumb indicates value position on the slider
-	local thumb = f:CreateTexture("ColorPPHueBarThumb", fh)
+	local thumb = f:CreateTexture("ColorPPHueBarThumb") --fh)
 	thumb:SetTexture("Interface\\AddOns\\ColorPickerPlus\\Media\\SliderVBar.tga", false)
 	thumb:SetDrawLayer("OVERLAY")
 	thumb:SetSize(hueBarWidth+6, 8)
@@ -909,15 +918,20 @@ function MOD:CreateOpacityBar()
 	f:SetScript("OnMouseDown", OpacityBarOnMouseDown)
 
 
-	local t = f:CreateTexture("ColorPPOpacityBarBG", f)
+	local t = f:CreateTexture("ColorPPOpacityBarBG") -- f)
 	t:SetPoint("TOP", ColorPPOpacityBar, "TOP", 0, 0)
 	t:SetSize(opacityBarWidth, opacityBarHeight)
 	t:SetVertexColor(1.0, 1.0, 1.0, 1.0)
 	t:SetColorTexture(1.0, 1.0, 1.0, 1.0)
-	t:SetGradient("VERTICAL",  1, 1, 1, 0, 0, 0 )
+    
+    if isDragonflight then
+        t:SetGradient("VERTICAL",  CreateColor(1, 1, 1, 1), CreateColor(0, 0, 0, 1) )
+    else
+        t:SetGradient("VERTICAL",  1, 1, 1, 0, 0, 0 )
+    end
 
  	-- Thumb indicates value position on the slider
-	local thumb = f:CreateTexture("ColorPPOpacityBarThumb", f)
+	local thumb = f:CreateTexture("ColorPPOpacityBarThumb") --f)
 	thumb:SetTexture("Interface\\AddOns\\ColorPickerPlus\\Media\\SliderVBar.tga", false)
 	--thumb:SetTexture("Interface\\AddOns\\ColorPickerPlus\\Media\\ThinVSlider2.tga", false)
 	thumb:SetSize(opacityBarWidth+6, 8)
