@@ -615,7 +615,7 @@ function MOD:CreateClassPalette()
 	fr:Show()
 
 	-- create label for frame
-	local t = fr:CreateFontString(fr)
+	local t = fr:CreateFontString("FontString")
 	t:SetFontObject("GameFontNormal")
 	t:SetText("Class Colors")
 	t:SetTextColor(1,1,1,1)
@@ -822,27 +822,27 @@ function MOD:CreateHueBar()
 	fh:SetScript("OnMouseDown", HueBarOnMouseDown)
 
 	local color = {
-		{ r = 1.0, g = 0.0, b = 0.0 },	-- Red
-		{ r = 1.0, g = 1.0, b = 0.0 },	-- Yellow
-		{ r = 0.0, g = 1.0, b = 0.0 },	-- Green
-		{ r = 0.0, g = 1.0, b = 1.0 },	-- Cyan
-		{ r = 0.0, g = 0.0, b = 1.0 },	-- Blue
-		{ r = 1.0, g = 0.0, b = 1.0 },	-- Purple
-		{ r = 1.0, g = 0.0, b = 0.0 },	-- Red again
+		{ r = 1.0, g = 0.0, b = 0.0, a = 1.0 },	-- Red
+		{ r = 1.0, g = 1.0, b = 0.0, a = 1.0 },	-- Yellow
+		{ r = 0.0, g = 1.0, b = 0.0, a = 1.0 },	-- Green
+		{ r = 0.0, g = 1.0, b = 1.0, a = 1.0 },	-- Cyan
+		{ r = 0.0, g = 0.0, b = 1.0, a = 1.0 },	-- Blue
+		{ r = 1.0, g = 0.0, b = 1.0, a = 1.0 },	-- Purple
+		{ r = 1.0, g = 0.0, b = 0.0, a = 1.0 },	-- Red again
 	}
-
+	
 	for i = 1, 6 do
-		local t = f:CreateTexture("ColorPPHue"..tostring(i), ColorPPHueBar)
+		local t = f:CreateTexture("ColorPPHue"..tostring(i))
 		if i == 1 then t:SetPoint("TOP", ColorPPHueBar, "TOP", 0, 0)
 			else t:SetPoint("TOP", "ColorPPHue"..tostring(i-1), "BOTTOM", 0, 0) end
 		t:SetSize(hueBarWidth, hueTextureSize)
 		t:SetVertexColor(1.0, 1.0, 1.0, 1.0)
 		t:SetColorTexture(1.0, 1.0, 1.0, 1.0)
-		t:SetGradient("VERTICAL",  color[i+1].r, color[i+1].g, color[i+1].b, color[i].r, color[i].g, color[i].b )
+		t:SetGradient("VERTICAL",  color[i+1], color[i])
 	end
 
 	-- Thumb indicates value position on the slider
-	local thumb = f:CreateTexture("ColorPPHueBarThumb", fh)
+	local thumb = fh:CreateTexture("ColorPPHueBarThumb")
 	thumb:SetTexture("Interface\\AddOns\\ColorPickerPlus\\Media\\SliderVBar.tga", false)
 	thumb:SetDrawLayer("OVERLAY")
 	thumb:SetSize(hueBarWidth+6, 8)
@@ -909,15 +909,15 @@ function MOD:CreateOpacityBar()
 	f:SetScript("OnMouseDown", OpacityBarOnMouseDown)
 
 
-	local t = f:CreateTexture("ColorPPOpacityBarBG", f)
+	local t = f:CreateTexture("ColorPPOpacityBarBG")
 	t:SetPoint("TOP", ColorPPOpacityBar, "TOP", 0, 0)
 	t:SetSize(opacityBarWidth, opacityBarHeight)
 	t:SetVertexColor(1.0, 1.0, 1.0, 1.0)
 	t:SetColorTexture(1.0, 1.0, 1.0, 1.0)
-	t:SetGradient("VERTICAL",  1, 1, 1, 0, 0, 0 )
+	t:SetGradient("VERTICAL",  { r = 1, g = 1, b = 1, a = 1 }, { r = 0, g = 0, b = 0, a = 1 } )
 
  	-- Thumb indicates value position on the slider
-	local thumb = f:CreateTexture("ColorPPOpacityBarThumb", f)
+	local thumb = f:CreateTexture("ColorPPOpacityBarThumb")
 	thumb:SetTexture("Interface\\AddOns\\ColorPickerPlus\\Media\\SliderVBar.tga", false)
 	--thumb:SetTexture("Interface\\AddOns\\ColorPickerPlus\\Media\\ThinVSlider2.tga", false)
 	thumb:SetSize(opacityBarWidth+6, 8)
