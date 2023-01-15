@@ -44,8 +44,8 @@ local colorSwatchWidth = 120
 local colorSwatchHeight = 120
 -- local isClassic = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC) -- true if on classic server
 local isClassic = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC) or
-									(WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC) or
-									(WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC)
+                  (WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC) or
+                  (WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC)
 
 -- bgtable used in creation of backdrops
 local bgtable = {
