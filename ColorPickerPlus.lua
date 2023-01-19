@@ -43,7 +43,8 @@ local gradientHeight = 160
 local colorSwatchWidth = 120
 local colorSwatchHeight = 120
 -- local isClassic = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC) -- true if on classic server
-local isClassic = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC) or (WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC)
+local isClassic = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC) 
+local isWrath = (WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC)
 local isDragonflight = floor(select(4, GetBuildInfo()) / 10000) == 10
 
 -- bgtable used in creation of backdrops
@@ -326,7 +327,7 @@ function MOD:CleanUpColorPickerFrame()
 	end
 
 	-- Add the "Color Picker Plus" dialog title
-	if isClassic then
+	if isClassic or isWrath then
 		local t = ColorPickerFrame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
 		t:SetFontObject("GameFontNormal")
 		t:SetText("Color Picker Plus")
@@ -843,7 +844,7 @@ function MOD:CreateHueBar()
 		t:SetSize(hueBarWidth, hueTextureSize)
 		t:SetVertexColor(1.0, 1.0, 1.0, 1.0)
 		t:SetColorTexture(1.0, 1.0, 1.0, 1.0)
-        if isDragonflight then
+        if isDragonflight or isWrath then
             t:SetGradient("VERTICAL", CreateColor(color[i+1].r, color[i+1].g, color[i+1].b, 1), CreateColor(color[i].r, color[i].g, color[i].b, 1) )
         else
             t:SetGradient("VERTICAL",  color[i+1].r, color[i+1].g, color[i+1].b, color[i].r, color[i].g, color[i].b )
@@ -924,7 +925,7 @@ function MOD:CreateOpacityBar()
 	t:SetVertexColor(1.0, 1.0, 1.0, 1.0)
 	t:SetColorTexture(1.0, 1.0, 1.0, 1.0)
     
-    if isDragonflight then
+    if isDragonflight or isWrath then
         t:SetGradient("VERTICAL",  CreateColor(1, 1, 1, 1), CreateColor(0, 0, 0, 1) )
     else
         t:SetGradient("VERTICAL",  1, 1, 1, 0, 0, 0 )
