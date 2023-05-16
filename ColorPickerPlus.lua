@@ -117,6 +117,17 @@ local classColorPalette = {
 		{ r = 0.78, g = 0.61, b = 0.43, a = 1.0 }, -- Warrior Tan
 	}
 
+if isClassic then
+	tremove(classColorPalette, 7) -- Monk
+	tremove(classColorPalette, 4) -- Evoker
+	tremove(classColorPalette, 2) -- Demon Hunter
+	tremove(classColorPalette, 1) -- Death Knight
+elseif isWrath then
+	tremove(classColorPalette, 7) -- Monk
+	tremove(classColorPalette, 4) -- Evoker
+	tremove(classColorPalette, 2) -- Demon Hunter
+end
+
 --EVENT REGISTRATION
 -------------------------------------------------------------------------------------------------------------------------
 -- these need to happen inline at lua file load time
@@ -601,7 +612,7 @@ end
 
 function MOD:CreateClassPalette()
 
-	local rows = 3
+	local rows = isDragonflight and 4 or 3
 	local cols = 4
 	local spacer = 2
 	local margin = 0
@@ -631,6 +642,7 @@ function MOD:CreateClassPalette()
 		for i = 1, cols do
 			k = k+1
 			local c = classColorPalette[k]
+			if not c then break end
 			local f = CreateFrame("Frame", "ColorPPswatch_"..tostring(k), fr, BackdropTemplateMixin and "BackdropTemplate")
 			f._cppKey = k
 			f:SetBackdrop(bgtable)
