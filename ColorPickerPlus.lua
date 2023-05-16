@@ -118,10 +118,12 @@ local classColorPalette = {
 	}
 
 if isClassic then
+	tremove(classColorPalette, 7) -- Monk
 	tremove(classColorPalette, 4) -- Evoker
 	tremove(classColorPalette, 2) -- Demon Hunter
 	tremove(classColorPalette, 1) -- Death Knight
 elseif isWrath then
+	tremove(classColorPalette, 7) -- Monk
 	tremove(classColorPalette, 4) -- Evoker
 	tremove(classColorPalette, 2) -- Demon Hunter
 end
