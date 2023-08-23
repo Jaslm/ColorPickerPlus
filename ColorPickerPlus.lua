@@ -856,11 +856,7 @@ function MOD:CreateHueBar()
 		t:SetSize(hueBarWidth, hueTextureSize)
 		t:SetVertexColor(1.0, 1.0, 1.0, 1.0)
 		t:SetColorTexture(1.0, 1.0, 1.0, 1.0)
-        if isDragonflight or isWrath then
-            t:SetGradient("VERTICAL", CreateColor(color[i+1].r, color[i+1].g, color[i+1].b, 1), CreateColor(color[i].r, color[i].g, color[i].b, 1) )
-        else
-            t:SetGradient("VERTICAL",  color[i+1].r, color[i+1].g, color[i+1].b, color[i].r, color[i].g, color[i].b )
-        end
+        t:SetGradient("VERTICAL", CreateColor(color[i+1].r, color[i+1].g, color[i+1].b, 1), CreateColor(color[i].r, color[i].g, color[i].b, 1) )
 	end
 
 	-- Thumb indicates value position on the slider
@@ -936,12 +932,7 @@ function MOD:CreateOpacityBar()
 	t:SetSize(opacityBarWidth, opacityBarHeight)
 	t:SetVertexColor(1.0, 1.0, 1.0, 1.0)
 	t:SetColorTexture(1.0, 1.0, 1.0, 1.0)
-    
-    if isDragonflight or isWrath then
-        t:SetGradient("VERTICAL",  CreateColor(1, 1, 1, 1), CreateColor(0, 0, 0, 1) )
-    else
-        t:SetGradient("VERTICAL",  1, 1, 1, 0, 0, 0 )
-    end
+    t:SetGradient("VERTICAL",  CreateColor(1, 1, 1, 1), CreateColor(0, 0, 0, 1) )
 
  	-- Thumb indicates value position on the slider
 	local thumb = f:CreateTexture("ColorPPOpacityBarThumb") --f)
