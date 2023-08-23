@@ -5,5 +5,4 @@
 ## DefaultState: Enabled
 ## SavedVariables: ColorPickerPlusDB
 
-
 ColorPickerPlus.lua
