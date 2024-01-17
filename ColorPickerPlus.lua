@@ -42,8 +42,8 @@ local gradientHeight = 160
 
 local colorSwatchWidth = 120
 local colorSwatchHeight = 120
--- local isClassic = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC) -- true if on classic server
-local isClassic = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC) 
+
+local isClassic = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC)
 local isWrath = (WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC)
 local isDragonflight = floor(select(4, GetBuildInfo()) / 10000) == 10
 
@@ -55,15 +55,15 @@ local valueThumbTexture = ColorPickerFrame.Content.ColorPicker.ValueThumb and Co
 local alphaFrame = ColorPickerFrame.Content.ColorPicker.Alpha and ColorPickerFrame.Content.ColorPicker.Alpha
 local alphaThumb = ColorPickerFrame.Content.ColorPicker.AlphaThumb and ColorPickerFrame.Content.ColorPicker.AlphaThumb
 
--- bgtable used in creation of backdrops
-local bgtable = {
-		bgFile = "Interface\\Buttons\\WHITE8X8",
-		edgeFile = "Interface\\Buttons\\WHITE8X8",
-		tile = false,
-		tileSize = 16,
-		edgeSize = 1,
-		insets = { 0, 0, 0, 0 },
-	}
+-- bgTable used in creation of backdrops
+local bgTable = {
+	bgFile = "Interface\\Buttons\\WHITE8X8",
+	edgeFile = "Interface\\Buttons\\WHITE8X8",
+	tile = false,
+	tileSize = 16,
+	edgeSize = 1,
+	insets = { 0, 0, 0, 0 },
+}
 
 -- initial values in palette
 -- these are overridden by user and saved in WoW SavedVariables
@@ -280,16 +280,6 @@ function MOD:UpdateHueBarThumb()
 end
 
 function MOD:UpdateColorGraphics()
---[[
-	local r, g, b = ColorPickerFrame:GetColorRGB()
-	local h, s, v = colorHue, colorSat, colorVal
-	local a = MOD:GetAlpha()
-	print("UPDATE COLOR GRAPHICS")
-	print("r, g, b = ", floor(100*r), floor(100*g), floor(100*b))
-	print("h, s, v = ", floor(h*360), floor(s*100), floor(v*100))
-	print("alpha = ", floor(a*100))
---]]
-
 	MOD:UpdateChosenColor()
 	MOD:UpdateGradientColorOverlay()
 	MOD:UpdateGradientThumb()
@@ -430,8 +420,8 @@ function MOD:CreateColorSwatches()
 
 	-- create frame for the old color that was passed in, to display color as its backdrop color
 	local fr = CreateFrame("Frame", "ColorPPOldColor", fh, "BackdropTemplate")
-	fr:SetBackdrop(bgtable)
-	fr:SetFrameLevel(opacitySliderFrame:GetFrameLevel())
+	fr:SetBackdrop(bgTable)
+	fr:SetFrameLevel(ColorPickerFrame:GetFrameLevel() + 1)
 	fr:SetSize(colorSwatchWidth,colorSwatchHeight*0.35)
 	fr:ClearAllPoints()
 	fr:SetPoint("TOPLEFT", fh, "TOPLEFT")
@@ -442,7 +432,7 @@ function MOD:CreateColorSwatches()
 
 	-- create frame for the chosen color for backdrop
 	fr = CreateFrame("Frame", "ColorPPChosenColor", ColorPickerFrame, "BackdropTemplate")
-	fr:SetBackdrop(bgtable)
+	fr:SetBackdrop(bgTable)
 	fr:SetSize(colorSwatchWidth,colorSwatchHeight*0.65)
 	fr:ClearAllPoints()
 	fr:SetPoint("TOPLEFT", ColorPPOldColor, "BOTTOMLEFT", 0, 0)
@@ -456,7 +446,7 @@ function MOD:CreateCopyPasteArea()
 
 	-- create frame for buttons and copiedColorSwatch
 	fr = CreateFrame("Frame", "ColorPPCopyPasteArea", ColorPPPaletteFrame, "BackdropTemplate")
-	fr:SetBackdrop(bgtable)
+	fr:SetBackdrop(bgTable)
 	fr:SetSize(gradientWidth-10, gradientHeight-10)
 	fr:ClearAllPoints()
 	fr:SetPoint ("CENTER", ColorPPPaletteFrame, "CENTER", 0, 0)
@@ -467,7 +457,7 @@ function MOD:CreateCopyPasteArea()
 	-- Create copiedColorSwatch
 	local f = CreateFrame("Frame", "ColorPPCopiedColor", fr, "BackdropTemplate")
 	local x = colorSwatchHeight*0.65
-	f:SetBackdrop(bgtable)
+	f:SetBackdrop(bgTable)
 	f:SetBackdropColor(0,0,0,0)
 	f:SetBackdropBorderColor(0.1, 0.1, 0.1, 1)
 	f:SetSize(x, x)
@@ -488,8 +478,8 @@ function MOD:CreateCopyPasteArea()
 	-- add copy button
 	local b = CreateFrame("Button", "ColorPPCopy", fr, "UIPanelButtonTemplate")
 	b:SetText("<-- Copy")
-	b:SetWidth("80")
-	b:SetHeight("22")
+	b:SetWidth(80)
+	b:SetHeight(22)
 	b:SetScale(0.80)
 	b:SetPoint("TOP", "ColorPPCopiedColor", "TOP", 0, -20)
 	b:SetPoint("RIGHT", "ColorPPCopyPasteArea", "RIGHT", 0, 0)
@@ -510,8 +500,8 @@ function MOD:CreateCopyPasteArea()
 	-- add paste button to the ColorPickerFrame
 	b = CreateFrame("Button", "ColorPPPaste", fr, "UIPanelButtonTemplate")
 	b:SetText("Paste -->")
-	b:SetWidth("80")
-	b:SetHeight("22")
+	b:SetWidth(80)
+	b:SetHeight(22)
 	b:SetScale(0.8)
 	b:SetPoint("TOPRIGHT", "ColorPPCopy", "BOTTOMRIGHT", 0, -10)
 	b:Disable()  -- enable when something has been copied
@@ -571,7 +561,7 @@ function MOD:CreatePalette()
 
 	-- create frame for palette
 	fr = CreateFrame("Frame", "ColorPPPalette", ColorPPPaletteFrame, "BackdropTemplate")
-	fr:SetBackdrop(bgtable)
+	fr:SetBackdrop(bgTable)
 	fr:SetSize((cols*swatchSize)+((cols-1)*spacer)+(2*margin), (rows*swatchSize)+((rows-1)*spacer)+(2*margin))
 	fr:ClearAllPoints()
 	fr:SetPoint ("CENTER", ColorPPPaletteFrame, "CENTER", 0, 0)
@@ -588,7 +578,7 @@ function MOD:CreatePalette()
 			local c = DB.palette[k]
 			local f = CreateFrame("Frame", "ColorPPswatch_"..tostring(k), fr, "BackdropTemplate")
 			f._cppKey = k
-			f:SetBackdrop(bgtable)
+			f:SetBackdrop(bgTable)
 			f:SetBackdropColor(c.r,c.g,c.b,c.a)
 			f:SetBackdropBorderColor(0, 0, 0, c.a)
 			f:SetSize(swatchSize, swatchSize)
@@ -629,7 +619,7 @@ function MOD:CreateClassPalette()
 
 	-- create frame for palette
 	local fr = CreateFrame("Frame", "ColorPPClassPalette", ColorPPPaletteFrame, "BackdropTemplate")
-	fr:SetBackdrop(bgtable)
+	fr:SetBackdrop(bgTable)
 	fr:SetSize((cols*swatchSize)+((cols-1)*spacer)+(2*margin), (rows*swatchSize)+((rows-1)*spacer)+(2*margin))
 	fr:ClearAllPoints()
 	fr:SetPoint ("CENTER", ColorPPPaletteFrame, "CENTER", 0, -5)
@@ -653,7 +643,7 @@ function MOD:CreateClassPalette()
 			if not c then break end
 			local f = CreateFrame("Frame", "ColorPPswatch_"..tostring(k), fr, "BackdropTemplate")
 			f._cppKey = k
-			f:SetBackdrop(bgtable)
+			f:SetBackdrop(bgTable)
 			f:SetBackdropColor(c.r,c.g,c.b,c.a)
 			f:SetBackdropBorderColor(0, 0, 0, c.a)
 			f:SetSize(swatchSize, swatchSize)
@@ -698,10 +688,10 @@ local function GradientOnUpdate(self)
 			local width = right - left
 
 			-- Get the cursor position and account for any UI Scale settings
-			local uiscale = UIParent:GetEffectiveScale()
+			local uiScale = UIParent:GetEffectiveScale()
 			local x, y = GetCursorPosition()
-			x = x/uiscale
-			y = y/uiscale
+			x = x/uiScale
+			y = y/uiScale
 
 			local mousePosX = right - x
 			local mousePosY = top - y
@@ -802,10 +792,10 @@ local function HueBarOnUpdate(self)  -- it's actually the holder that receives t
 			local height = top - bottom
 
 			-- Get the cursor position and account for any UI Scale settings
-			local uiscale = UIParent:GetEffectiveScale()
+			local uiScale = UIParent:GetEffectiveScale()
 			local x, y = GetCursorPosition()
-			x = x / uiscale
-			y = y / uiscale
+			x = x / uiScale
+			y = y / uiScale
 
 			if (y < bottom) then  colorHue = 1
 				elseif (y > top) then colorHue = 0
@@ -855,12 +845,12 @@ function MOD:CreateHueBar()
 	}
 
 	for i = 1, 6 do
-		local t = f:CreateTexture("ColorPPHue"..tostring(i)) --ColorPPHueBar:GetDrawLayer())
-		if i == 1 then 
-            t:SetPoint("TOP", ColorPPHueBar, "TOP", 0, 0)
-        else 
-            t:SetPoint("TOP", "ColorPPHue"..tostring(i-1), "BOTTOM", 0, 0) 
-        end
+		local t = f:CreateTexture("ColorPPHue"..tostring(i), "OVERLAY")
+		if i == 1 then
+			t:SetPoint("TOP", ColorPPHueBar, "TOP", 0, 0)
+		else
+			t:SetPoint("TOP", "ColorPPHue"..tostring(i-1), "BOTTOM", 0, 0)
+		end
 		t:SetSize(hueBarWidth, hueTextureSize)
 		t:SetVertexColor(1.0, 1.0, 1.0, 1.0)
 		t:SetColorTexture(1.0, 1.0, 1.0, 1.0)
@@ -868,8 +858,8 @@ function MOD:CreateHueBar()
 	end
 
 	-- Thumb indicates value position on the slider
-	local thumb = f:CreateTexture("ColorPPHueBarThumb", "OVERLAY") --fh)
-	thumb:SetTexture("Interface\\AddOns\\ColorPickerPlus\\Media\\SliderVBar.tga", false)
+	local thumb = f:CreateTexture("ColorPPHueBarThumb", "OVERLAY")
+	thumb:SetTexture("Interface\\AddOns\\ColorPickerPlus\\Media\\SliderVBar.tga")
 	thumb:SetDrawLayer("OVERLAY")
 	thumb:SetSize(hueBarWidth+6, 8)
 
@@ -944,8 +934,7 @@ function MOD:CreateOpacityBar()
 
  	-- Thumb indicates value position on the slider
 	local thumb = f:CreateTexture("ColorPPOpacityBarThumb", "OVERLAY") --f)
-	thumb:SetTexture("Interface\\AddOns\\ColorPickerPlus\\Media\\SliderVBar.tga", false)
-	--thumb:SetTexture("Interface\\AddOns\\ColorPickerPlus\\Media\\ThinVSlider2.tga", false)
+	thumb:SetTexture("Interface\\AddOns\\ColorPickerPlus\\Media\\SliderVBar.tga")
 	thumb:SetSize(opacityBarWidth+6, 8)
 	thumb:SetDrawLayer("OVERLAY", 4)
 	thumb:SetPoint("CENTER", f, "CENTER", 0, 0)
@@ -961,9 +950,8 @@ function MOD:CreateTextBoxes()
 	for i = 1, table.getn(boxes) do
 
 		local rgb = boxes[i]
-		--local box = CreateFrame("EditBox", "ColorPPBox"..rgb, ColorPickerFrame, "InputBoxTemplate")
 		local box = CreateFrame("EditBox", "ColorPPBox"..rgb, ColorPickerFrame, "BackdropTemplate")
-		box:SetBackdrop(bgtable)
+		box:SetBackdrop(bgTable)
 		box:SetBackdropColor(0.1,0.1,0.1,0.7)
 		box:SetBackdropBorderColor(0.3, 0.3, 0.3, 0.7)
 		box:SetFontObject("GameFontNormal")
@@ -1048,7 +1036,6 @@ local function ColorPPTooltipShow(self)
 			GameTooltip:AddLine("Shift left click on palette to save color to palette")
 		end
 	end
-	--GameToolTip:AddLine("Left click on old color to reset current color")
 	GameTooltip:Show()
 end
 
@@ -1058,7 +1045,7 @@ end
 
 function MOD:CreateHelpFrame()
 	local fr = CreateFrame("Frame", "ColorPPHelp", ColorPickerFrame)
-	fr:SetFrameLevel(opacitySliderFrame:GetFrameLevel())
+	fr:SetFrameLevel(ColorPickerFrame:GetFrameLevel() + 1)
 	fr:SetSize(hueBarWidth,hueBarWidth)
 	fr:ClearAllPoints()
 	fr:SetPoint("TOPLEFT", ColorPPHueBar, "BOTTOMLEFT", 0, -spacing)
@@ -1104,8 +1091,8 @@ function MOD:CreatePaletteSwitcher()
 	b:SetText("@")
 	local f = b:GetFontString()
 	f:SetTextColor(1,1,1,1)
-	b:SetWidth("24")
-	b:SetHeight("24")
+	b:SetWidth(24)
+	b:SetHeight(24)
 	b:SetScale(0.80)
 	b:SetPoint("BOTTOMLEFT", "ColorPPHelp", "BOTTOMRIGHT", 5, 0)
 
@@ -1137,7 +1124,9 @@ function MOD:Initialize_UI()
 	MOD:CreateColorSwatches()
 	MOD:CreateHelpFrame()
 	MOD:CreatePaletteSwitcher()
-
+	
+	ColorPickerFrame.Footer.CancelButton:SetSize(100,22)
+	ColorPickerFrame.Footer.OkayButton:SetSize(100,22)
 end
 
 function MOD.PLAYER_LOGIN()
@@ -1300,4 +1289,3 @@ function MOD:UpdateAlphaText()
 	ColorPPBoxA:SetText(string.format("%d", a))
 	MOD:UpdateOpacityBarThumb()
 end
-

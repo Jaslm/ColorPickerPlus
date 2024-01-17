@@ -33,6 +33,7 @@
         "ColorPPBoxB",
         "ColorPPBoxX",
         "ColorPPGradient",
-        "ColorPickerFrameHeader"
+        "ColorPickerFrameHeader",
+        "LeftButton"
     ]
 }
