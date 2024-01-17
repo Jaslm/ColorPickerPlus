@@ -47,6 +47,14 @@ local isClassic = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC)
 local isWrath = (WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC)
 local isDragonflight = floor(select(4, GetBuildInfo()) / 10000) == 10
 
+local opacitySliderFrame = OpacityFrameSlider and OpacityFrameSlider or OpacitySliderFrame
+local wheelFrame = ColorPickerFrame.Content.ColorPicker.Wheel and ColorPickerFrame.Content.ColorPicker.Wheel or ColorPickerWheel
+local wheelThumbTexture = ColorPickerFrame.Content.ColorPicker.WheelThumb and ColorPickerFrame.Content.ColorPicker.WheelThumb or ColorPickerFrame:GetColorWheelThumbTexture()
+local colorValueTexture = ColorPickerFrame.Content.ColorPicker.Value and ColorPickerFrame.Content.ColorPicker.Value or ColorPickerFrame:GetColorValueTexture()
+local valueThumbTexture = ColorPickerFrame.Content.ColorPicker.ValueThumb and ColorPickerFrame.Content.ColorPicker.ValueThumb or ColorPickerFrame:GetColorValueThumbTexture()
+local alphaFrame = ColorPickerFrame.Content.ColorPicker.Alpha and ColorPickerFrame.Content.ColorPicker.Alpha
+local alphaThumb = ColorPickerFrame.Content.ColorPicker.AlphaThumb and ColorPickerFrame.Content.ColorPicker.AlphaThumb
+
 -- bgtable used in creation of backdrops
 local bgtable = {
 		bgFile = "Interface\\Buttons\\WHITE8X8",
@@ -201,7 +209,7 @@ end
 function MOD:GetAlpha()
 	local a
 	if ColorPickerFrame.hasOpacity then
-		a = 1-OpacitySliderFrame:GetValue()  -- blizzard values are reversed from expected transparency
+		a = 1-opacitySliderFrame:GetValue()  -- blizzard values are reversed from expected transparency
 	else
 		a = 1
 	end
@@ -258,7 +266,7 @@ function MOD:UpdateGradientThumb()
 end
 
 function MOD:UpdateOpacityBarThumb()
-	local a = OpacitySliderFrame:GetValue()
+	local a = opacitySliderFrame:GetValue()
 	local ry = a*opacityBarHeight
 	ColorPPOpacityBarThumb:ClearAllPoints()
 	ColorPPOpacityBarThumb:SetPoint("CENTER", ColorPPOpacityBar, "BOTTOM", 0, ry)
@@ -291,7 +299,7 @@ end
 function MOD:ShowHideAlpha()
 	-- show/hide the alpha box and adjust related components
 	if ColorPickerFrame.hasOpacity then
-		OpacitySliderFrame:Hide()    -- have to do this every time
+		opacitySliderFrame:Hide()    -- have to do this every time
 		ColorPPOpacityBar:Show()
 		ColorPPBoxA:Show()
 		ColorPPBoxLabelA:Show()
@@ -322,12 +330,13 @@ end
 function MOD:CleanUpColorPickerFrame()
 
 	-- First, disable some standard Blizzard components
-	ColorPickerWheel:Hide()
-	ColorPickerFrame:GetColorWheelThumbTexture():Hide()
-	ColorPickerFrame:GetColorValueTexture():Hide()
-	ColorPickerFrame:GetColorValueThumbTexture():Hide()
-	ColorSwatch:Hide()
-	OpacitySliderFrame:Hide()
+	wheelThumbTexture:Hide()
+	colorValueTexture:Hide()
+	valueThumbTexture:Hide()
+	wheelFrame:Hide()
+	opacitySliderFrame:Hide()
+	alphaFrame:Hide()
+	alphaThumb:Hide()
 
 	-- Hide the "Color Picker" dialog title
 	local children = { ColorPickerFrame:GetRegions() }
@@ -393,7 +402,7 @@ local function OldColorOnMouseUp (frame, button)
 		ColorPickerFrame:SetColorRGB(r, g, b)
 		ColorPickerFrame.func()
 		MOD:UpdateHSVfromColorPickerRGB()
-		OpacitySliderFrame:SetValue(1-a)
+		opacitySliderFrame:SetValue(1-a)
 
 		MOD:UpdateColorGraphics()
 		MOD:UpdateColorTexts()
@@ -422,7 +431,7 @@ function MOD:CreateColorSwatches()
 	-- create frame for the old color that was passed in, to display color as its backdrop color
 	local fr = CreateFrame("Frame", "ColorPPOldColor", fh, BackdropTemplateMixin and "BackdropTemplate")
 	fr:SetBackdrop(bgtable)
-	fr:SetFrameLevel(OpacitySliderFrame:GetFrameLevel())
+	fr:SetFrameLevel(opacitySliderFrame:GetFrameLevel())
 	fr:SetSize(colorSwatchWidth,colorSwatchHeight*0.35)
 	fr:ClearAllPoints()
 	fr:SetPoint("TOPLEFT", fh, "TOPLEFT")
@@ -515,7 +524,7 @@ function MOD:CreateCopyPasteArea()
 		ColorPickerFrame:SetColorRGB(r, g, b)
 		ColorPickerFrame.func()
 		MOD:UpdateHSVfromColorPickerRGB()
-		OpacitySliderFrame:SetValue(1-a)
+		opacitySliderFrame:SetValue(1-a)
 
 		MOD:UpdateColorGraphics()
 		MOD:UpdateColorTexts()
@@ -542,7 +551,7 @@ local function PaletteSwatchOnMouseUp (frame, button)
 				ColorPickerFrame:SetColorRGB(r, g, b)
 				ColorPickerFrame.func()
 				MOD:UpdateHSVfromColorPickerRGB()
-				OpacitySliderFrame:SetValue(1-a)
+				opacitySliderFrame:SetValue(1-a)
 
 				MOD:UpdateColorGraphics()
 				MOD:UpdateColorTexts()
@@ -601,7 +610,7 @@ local function ClassPaletteSwatchOnMouseUp (frame, button)
 		ColorPickerFrame:SetColorRGB(r, g, b)
 		ColorPickerFrame.func()
 		MOD:UpdateHSVfromColorPickerRGB()
-		OpacitySliderFrame:SetValue(1-a)
+		opacitySliderFrame:SetValue(1-a)
 
 		MOD:UpdateColorGraphics()
 		MOD:UpdateColorTexts()
@@ -664,7 +673,7 @@ local function GradientOnMouseDown(self, button)
 	if self:IsMouseOver() and IsMouseButtonDown(LeftButton) then
 		if not (lockedHueBar or lockedOpacityBar) then
 			lockedGradient = true
-			if ColorPickerFrame.hasOpacity then lockedOpacity = 1-OpacitySliderFrame:GetValue() else lockedOpacity = 1 end
+			if ColorPickerFrame.hasOpacity then lockedOpacity = 1-opacitySliderFrame:GetValue() else lockedOpacity = 1 end
 		end
 	end
 end
@@ -769,7 +778,7 @@ local function HueBarOnMouseDown(self, button)
 	if self:IsMouseOver() and IsMouseButtonDown(LeftButton) then
 		if not (lockedGradient or lockedOpacityBar) then
 			lockedHueBar = true
-			if ColorPickerFrame.hasOpacity then lockedOpacity = 1-OpacitySliderFrame:GetValue() else lockedOpacity = 1 end
+			if ColorPickerFrame.hasOpacity then lockedOpacity = 1-opacitySliderFrame:GetValue() else lockedOpacity = 1 end
 			MOD:UpdateHueBarThumb()
 		end
 	end
@@ -904,7 +913,7 @@ local function OpacityBarOnUpdate(self)
 					a = 1-((top-y) / height)
 			end
 
-		OpacitySliderFrame:SetValue(a)  -- blizzard reverse alpha
+		opacitySliderFrame:SetValue(a)  -- blizzard reverse alpha
 		MOD:UpdateAlphaText()
 		local r, g, b = ColorPickerFrame:GetColorRGB()
 		ColorPPChosenColor:SetBackdropColor(r, g, b, 1-a)
@@ -1050,7 +1059,7 @@ end
 
 function MOD:CreateHelpFrame()
 	local fr = CreateFrame("Frame", "ColorPPHelp", ColorPickerFrame)
-	fr:SetFrameLevel(OpacitySliderFrame:GetFrameLevel())
+	fr:SetFrameLevel(opacitySliderFrame:GetFrameLevel())
 	fr:SetSize(hueBarWidth,hueBarWidth)
 	fr:ClearAllPoints()
 	fr:SetPoint("TOPLEFT", ColorPPHueBar, "BOTTOMLEFT", 0, -spacing)
@@ -1279,14 +1288,14 @@ function MOD:AlphaTextChanged(tbox, userInput)
 		ColorPPBoxA:SetText(string.format("%d", a))
 	end
 	a = a / 100
-	OpacitySliderFrame:SetValue(1-a)
+	opacitySliderFrame:SetValue(1-a)
 	ColorPickerFrame.func()
 	MOD:UpdateOpacityBarThumb()
 	MOD:UpdateChosenColor()
 end
 
 function MOD:UpdateAlphaText()
-	local a = OpacitySliderFrame:GetValue()   -- still keeping value OpacitySliderFrame, to coordinate with WoW settings
+	local a = opacitySliderFrame:GetValue()   -- still keeping value opacityFrame, to coordinate with WoW settings
 	a = (1- a) * 100                          -- alpha value is reversed
 	a = math.floor(a +.05)
 	ColorPPBoxA:SetText(string.format("%d", a))
