@@ -174,8 +174,8 @@ local function HSV_to_RGB(ch, cs, cv)
 	local r, g, b = cv, cv, cv
 	if cs > 0 then -- if cs is zero then grey is returned
 		local h = ch * 6; local sextant = math.floor(h) -- figure out which sextant of the color wheel
-		local fract = h - sextant -- fractional offset into the sextant
-		local p, q, t = cv * (1 - cs), cv * (1 - (cs * fract)), cv * (1 - (cs * (1 - fract)))
+		local fractionalOffset = h - sextant -- fractional offset into the sextant
+		local p, q, t = cv * (1 - cs), cv * (1 - (cs * fractionalOffset)), cv * (1 - (cs * (1 - fractionalOffset)))
 		if sextant == 0 then
 			r, g, b = cv, t, p
 		elseif sextant == 1 then
@@ -951,10 +951,10 @@ local function OpacityBarOnUpdate(self)
 			local height = top - bottom
 
 			-- Get the cursor position and account for any UI Scale settings
-			local uiscale = UIParent:GetEffectiveScale()
+			local uiScale = UIParent:GetEffectiveScale()
 			local x, y = GetCursorPosition()
-			x = x / uiscale
-			y = y / uiscale
+			x = x / uiScale
+			y = y / uiScale
 
 			local a
 		    if (y < bottom) then  a = 0
@@ -1203,28 +1203,28 @@ function MOD.PLAYER_LOGIN()
 	ColorPickerFrame:UnregisterEvent("PLAYER_LOGIN")  --so initialization only happens once
 end
 
-function MOD:RGBTextChanged(tbox, userInput)
+function MOD:RGBTextChanged(textBox, userInput)
 
 	if not userInput then return end
 
 	local r, g, b = ColorPickerFrame:GetColorRGB()
 	local sr, sg, sb = r, g, b -- save values for recovery after bad entry
 
-	local id = tbox:GetID()
+	local id = textBox:GetID()
 	if id == 1 then
-		r = tbox:GetNumber()
+		r = textBox:GetNumber()
 		if not r then r = 0 end
-		if r > 255 then tbox:SetText(string.format("%d", floor(sr*255))) return end
+		if r > 255 then textBox:SetText(string.format("%d", floor(sr*255))) return end
 		r = r/255
 	elseif id == 2 then
-		g = tbox:GetNumber()
+		g = textBox:GetNumber()
 		if not g then g = 0 end
-		if g > 255 then tbox:SetText(string.format("%d", floor(sg*255))) return end
+		if g > 255 then textBox:SetText(string.format("%d", floor(sg*255))) return end
 		g = g/255
 	elseif id == 3 then
-		b = tbox:GetNumber()
+		b = textBox:GetNumber()
 		if not b then b = 0 end
-		if b > 255 then tbox:SetText(string.format("%d", floor(sb*255))) return end
+		if b > 255 then textBox:SetText(string.format("%d", floor(sb*255))) return end
 		b = b/255
 	else return end
 
@@ -1243,15 +1243,15 @@ function MOD:RGBTextChanged(tbox, userInput)
 
 end
 
-function MOD:HexTextChanged(tbox, userInput)
+function MOD:HexTextChanged(textBox, userInput)
 
 	if not userInput then return end
 
 	local r, g, b = ColorPickerFrame:GetColorRGB()
 	local sr, sg, sb = r, g, b -- save values for recovery after bad entry
 
-	if tbox:GetNumLetters() == 6 then
-			local rgb = tbox:GetText()
+	if textBox:GetNumLetters() == 6 then
+			local rgb = textBox:GetText()
 			r, g, b = tonumber('0x'..strsub(rgb, 0, 2)), tonumber('0x'..strsub(rgb, 3, 4)), tonumber('0x'..strsub(rgb, 5, 6))
 			if not r then r = 0 else r = r/255 end
 			if not g then g = 0 else g = g/255 end
@@ -1273,27 +1273,27 @@ function MOD:HexTextChanged(tbox, userInput)
 
 end
 
-function MOD:HSVTextChanged(tbox, userInput)
+function MOD:HSVTextChanged(textBox, userInput)
 
 	if not userInput then return end
 
 	local h, s, v = colorHue, colorSat, colorVal
 
-	local id = tbox:GetID()
+	local id = textBox:GetID()
 	if id == 5 then
-		h = tbox:GetNumber()
+		h = textBox:GetNumber()
 		if not h then h = 0 end
-		if h > 360 then tbox:SetText(string.format("%d", floor(colorHue*360))) return end
+		if h > 360 then textBox:SetText(string.format("%d", floor(colorHue*360))) return end
 		h = h/360
 	elseif id == 6 then
-		s = tbox:GetNumber()
+		s = textBox:GetNumber()
 		if not s then s = 0 end
-		if s > 100 then tbox:SetText(string.format("%d", floor(colorSat*100))) return end
+		if s > 100 then textBox:SetText(string.format("%d", floor(colorSat*100))) return end
 		s = s/100
 	elseif id == 7 then
-		v = tbox:GetNumber()
+		v = textBox:GetNumber()
 		if not v then v = 0 end
-		if v > 100 then tbox:SetText(string.format("%d", floor(colorVal*100))) return end
+		if v > 100 then textBox:SetText(string.format("%d", floor(colorVal*100))) return end
 		v = v/100
 	else return	end
 
@@ -1354,9 +1354,9 @@ function MOD:UpdateHexText(r, g, b)
 	ColorPPBoxX:SetText(string.format("%.2x", r)..string.format("%.2x",g)..string.format("%.2x", b))
 end
 
-function MOD:AlphaTextChanged(tbox, userInput)
+function MOD:AlphaTextChanged(textBox, userInput)
 	if not userInput then return end -- we take care of updating elsewhere
-	local a = tbox:GetNumber()
+	local a = textBox:GetNumber()
 	if a > 100 then
 		a = 100
 		ColorPPBoxA:SetText(string.format("%d", a))
