@@ -429,7 +429,7 @@ function MOD:CreateColorSwatches()
 	fh:SetPoint("LEFT", ColorPPBoxR, "LEFT", -14, 0)
 
 	-- create frame for the old color that was passed in, to display color as its backdrop color
-	local fr = CreateFrame("Frame", "ColorPPOldColor", fh, BackdropTemplateMixin and "BackdropTemplate")
+	local fr = CreateFrame("Frame", "ColorPPOldColor", fh, "BackdropTemplate")
 	fr:SetBackdrop(bgtable)
 	fr:SetFrameLevel(opacitySliderFrame:GetFrameLevel())
 	fr:SetSize(colorSwatchWidth,colorSwatchHeight*0.35)
@@ -441,7 +441,7 @@ function MOD:CreateColorSwatches()
 	fr:Show()
 
 	-- create frame for the chosen color for backdrop
-	fr = CreateFrame("Frame", "ColorPPChosenColor", ColorPickerFrame, BackdropTemplateMixin and "BackdropTemplate")
+	fr = CreateFrame("Frame", "ColorPPChosenColor", ColorPickerFrame, "BackdropTemplate")
 	fr:SetBackdrop(bgtable)
 	fr:SetSize(colorSwatchWidth,colorSwatchHeight*0.65)
 	fr:ClearAllPoints()
@@ -455,7 +455,7 @@ end
 function MOD:CreateCopyPasteArea()
 
 	-- create frame for buttons and copiedColorSwatch
-	fr = CreateFrame("Frame", "ColorPPCopyPasteArea", ColorPPPaletteFrame, BackdropTemplateMixin and "BackdropTemplate")
+	fr = CreateFrame("Frame", "ColorPPCopyPasteArea", ColorPPPaletteFrame, "BackdropTemplate")
 	fr:SetBackdrop(bgtable)
 	fr:SetSize(gradientWidth-10, gradientHeight-10)
 	fr:ClearAllPoints()
@@ -465,7 +465,7 @@ function MOD:CreateCopyPasteArea()
 	fr:Show()
 
 	-- Create copiedColorSwatch
-	local f = CreateFrame("Frame", "ColorPPCopiedColor", fr, BackdropTemplateMixin and "BackdropTemplate")
+	local f = CreateFrame("Frame", "ColorPPCopiedColor", fr, "BackdropTemplate")
 	local x = colorSwatchHeight*0.65
 	f:SetBackdrop(bgtable)
 	f:SetBackdropColor(0,0,0,0)
@@ -570,7 +570,7 @@ function MOD:CreatePalette()
 	local swatchSize = 20
 
 	-- create frame for palette
-	fr = CreateFrame("Frame", "ColorPPPalette", ColorPPPaletteFrame, BackdropTemplateMixin and "BackdropTemplate")
+	fr = CreateFrame("Frame", "ColorPPPalette", ColorPPPaletteFrame, "BackdropTemplate")
 	fr:SetBackdrop(bgtable)
 	fr:SetSize((cols*swatchSize)+((cols-1)*spacer)+(2*margin), (rows*swatchSize)+((rows-1)*spacer)+(2*margin))
 	fr:ClearAllPoints()
@@ -586,7 +586,7 @@ function MOD:CreatePalette()
 		for i = 1, cols do
 			k = k+1
 			local c = DB.palette[k]
-			local f = CreateFrame("Frame", "ColorPPswatch_"..tostring(k), fr, BackdropTemplateMixin and "BackdropTemplate")
+			local f = CreateFrame("Frame", "ColorPPswatch_"..tostring(k), fr, "BackdropTemplate")
 			f._cppKey = k
 			f:SetBackdrop(bgtable)
 			f:SetBackdropColor(c.r,c.g,c.b,c.a)
@@ -628,7 +628,7 @@ function MOD:CreateClassPalette()
 	local swatchSize = 20
 
 	-- create frame for palette
-	fr = CreateFrame("Frame", "ColorPPClassPalette", ColorPPPaletteFrame, BackdropTemplateMixin and "BackdropTemplate")
+	local fr = CreateFrame("Frame", "ColorPPClassPalette", ColorPPPaletteFrame, "BackdropTemplate")
 	fr:SetBackdrop(bgtable)
 	fr:SetSize((cols*swatchSize)+((cols-1)*spacer)+(2*margin), (rows*swatchSize)+((rows-1)*spacer)+(2*margin))
 	fr:ClearAllPoints()
@@ -638,8 +638,7 @@ function MOD:CreateClassPalette()
 	fr:Show()
 
 	-- create label for frame
-	local t = fr:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-	t:SetFontObject("GameFontNormal")
+	local t = fr:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	t:SetText("Class Colors")
 	t:SetTextColor(1,1,1,1)
 	t:SetPoint("BOTTOM", fr, "TOP", 0, 5)
@@ -652,7 +651,7 @@ function MOD:CreateClassPalette()
 			k = k+1
 			local c = classColorPalette[k]
 			if not c then break end
-			local f = CreateFrame("Frame", "ColorPPswatch_"..tostring(k), fr, BackdropTemplateMixin and "BackdropTemplate")
+			local f = CreateFrame("Frame", "ColorPPswatch_"..tostring(k), fr, "BackdropTemplate")
 			f._cppKey = k
 			f:SetBackdrop(bgtable)
 			f:SetBackdropColor(c.r,c.g,c.b,c.a)
@@ -869,7 +868,7 @@ function MOD:CreateHueBar()
 	end
 
 	-- Thumb indicates value position on the slider
-	local thumb = f:CreateTexture("ColorPPHueBarThumb") --fh)
+	local thumb = f:CreateTexture("ColorPPHueBarThumb", "OVERLAY") --fh)
 	thumb:SetTexture("Interface\\AddOns\\ColorPickerPlus\\Media\\SliderVBar.tga", false)
 	thumb:SetDrawLayer("OVERLAY")
 	thumb:SetSize(hueBarWidth+6, 8)
@@ -936,15 +935,15 @@ function MOD:CreateOpacityBar()
 	f:SetScript("OnMouseDown", OpacityBarOnMouseDown)
 
 
-	local t = f:CreateTexture("ColorPPOpacityBarBG") -- f)
+	local t = f:CreateTexture("ColorPPOpacityBarBG", "OVERLAY") --f)
 	t:SetPoint("TOP", ColorPPOpacityBar, "TOP", 0, 0)
 	t:SetSize(opacityBarWidth, opacityBarHeight)
 	t:SetVertexColor(1.0, 1.0, 1.0, 1.0)
 	t:SetColorTexture(1.0, 1.0, 1.0, 1.0)
-    t:SetGradient("VERTICAL",  CreateColor(1, 1, 1, 1), CreateColor(0, 0, 0, 1) )
+	t:SetGradient("VERTICAL",  CreateColor(1, 1, 1, 1), CreateColor(0, 0, 0, 1) )
 
  	-- Thumb indicates value position on the slider
-	local thumb = f:CreateTexture("ColorPPOpacityBarThumb") --f)
+	local thumb = f:CreateTexture("ColorPPOpacityBarThumb", "OVERLAY") --f)
 	thumb:SetTexture("Interface\\AddOns\\ColorPickerPlus\\Media\\SliderVBar.tga", false)
 	--thumb:SetTexture("Interface\\AddOns\\ColorPickerPlus\\Media\\ThinVSlider2.tga", false)
 	thumb:SetSize(opacityBarWidth+6, 8)
@@ -963,7 +962,7 @@ function MOD:CreateTextBoxes()
 
 		local rgb = boxes[i]
 		--local box = CreateFrame("EditBox", "ColorPPBox"..rgb, ColorPickerFrame, "InputBoxTemplate")
-		local box = CreateFrame("EditBox", "ColorPPBox"..rgb, ColorPickerFrame, BackdropTemplateMixin and "BackdropTemplate")
+		local box = CreateFrame("EditBox", "ColorPPBox"..rgb, ColorPickerFrame, "BackdropTemplate")
 		box:SetBackdrop(bgtable)
 		box:SetBackdropColor(0.1,0.1,0.1,0.7)
 		box:SetBackdropBorderColor(0.3, 0.3, 0.3, 0.7)
@@ -1024,12 +1023,12 @@ function MOD:CreateTextBoxes()
 	ColorPPBoxA:SetPoint("RIGHT", ColorPPOpacityBar, "LEFT", -spacing, 0)
 	ColorPPBoxA:SetPoint("TOP", ColorPPBoxR, "TOP")
 
-		-- define the order of tab cursor movement
+	-- define the order of tab cursor movement
 	ColorPPBoxR:SetScript("OnTabPressed", function(self) ColorPPBoxG:SetFocus() end)
 	ColorPPBoxG:SetScript("OnTabPressed", function(self) ColorPPBoxB:SetFocus()  end)
 	ColorPPBoxB:SetScript("OnTabPressed", function(self) ColorPPBoxR:SetFocus()  end)
 
-		-- define the order of tab cursor movement
+	-- define the order of tab cursor movement
 	ColorPPBoxH:SetScript("OnTabPressed", function(self) ColorPPBoxS:SetFocus() end)
 	ColorPPBoxS:SetScript("OnTabPressed", function(self) ColorPPBoxV:SetFocus()  end)
 	ColorPPBoxV:SetScript("OnTabPressed", function(self) ColorPPBoxH:SetFocus()  end)
@@ -1075,7 +1074,7 @@ function MOD:CreateHelpFrame()
 end
 
 function MOD:CreatePaletteFrame()  -- sits below the color gradient box, holds various palettes
-	local fr = CreateFrame("Frame", "ColorPPPaletteFrame", ColorPickerFrame)
+	local fr = CreateFrame("Frame", "ColorPPPaletteFrame", ColorPickerFrame, "BackdropTemplate")
 	fr:SetSize(gradientWidth-10, gradientHeight -10)
 	fr:SetPoint("CENTER", ColorPPGradient, "CENTER", 0, 0)
 	fr:SetPoint("BOTTOM", ColorPPHueBar, "BOTTOM", 0, 0)
@@ -1101,7 +1100,7 @@ end
 
 function MOD:CreatePaletteSwitcher()
 	-- add copy button to the ColorPickerFrame
-	local b = CreateFrame("Button", "ColorPPSwitcher", ColorPickerFrame, "UIPanelButtonTemplate", BackdropTemplateMixin and "BackdropTemplate")
+	local b = CreateFrame("Button", "ColorPPSwitcher", ColorPickerFrame, "UIPanelButtonTemplate")
 	b:SetText("@")
 	local f = b:GetFontString()
 	f:SetTextColor(1,1,1,1)
@@ -1301,3 +1300,4 @@ function MOD:UpdateAlphaText()
 	ColorPPBoxA:SetText(string.format("%d", a))
 	MOD:UpdateOpacityBarThumb()
 end
+
