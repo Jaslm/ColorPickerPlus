@@ -34,6 +34,7 @@
         "ColorPPBoxX",
         "ColorPPGradient",
         "ColorPickerFrameHeader",
-        "LeftButton"
+        "LeftButton",
+        "ColorPPGradientTexture"
     ]
 }

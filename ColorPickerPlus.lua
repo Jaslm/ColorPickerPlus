@@ -222,12 +222,13 @@ function MOD:GetAlpha()
 		colorAlpha = ColorPickerFrame:GetColorAlpha()
 	else
 		colorAlpha = opacitySliderFrame:GetValue()
+		if ColorPickerFrame.hasOpacity then
+			a = 1 - colorAlpha -- blizzard values are reversed from expected transparency
+		else
+			a = 1
+		end
 	end
-	if ColorPickerFrame.hasOpacity then
-		a = 1 - colorAlpha -- blizzard values are reversed from expected transparency
-	else
-		a = 1
-	end
+
 	return a
 end
 
@@ -982,16 +983,18 @@ local function OpacityBarOnUpdate(self)
 				a = 1 - ((top - y) / height)
 			end
 
-			-- blizzard reverse alpha
 			if isDragonflight then
 				ColorPickerFrame.Content.ColorPicker:SetColorAlpha(a)
+				MOD:UpdateAlphaText()
+				local r, g, b = ColorPickerFrame:GetColorRGB()
+				ColorPPChosenColor:SetBackdropColor(r, g, b, a)
 			else
+				-- blizzard reverse alpha
 				opacitySliderFrame:SetValue(a)
+				MOD:UpdateAlphaText()
+				local r, g, b = ColorPickerFrame:GetColorRGB()
+				ColorPPChosenColor:SetBackdropColor(r, g, b, 1 - a)
 			end
-
-			MOD:UpdateAlphaText()
-			local r, g, b = ColorPickerFrame:GetColorRGB()
-			ColorPPChosenColor:SetBackdropColor(r, g, b, 1 - a)
 		end
 	else
 		lockedGradient = false
@@ -1479,8 +1482,13 @@ function MOD:AlphaTextChanged(textBox, userInput)
 end
 
 function MOD:UpdateAlphaText()
-	local a = ColorPickerFrame.GetColorAlpha and ColorPickerFrame:GetColorAlpha() or opacitySliderFrame:GetValue() -- still keeping value OpacityFrame, to coordinate with WoW settings
-	a = (1 - a) * 100 -- alpha value is reversed
+	local a
+	if isDragonflight then
+		a = ColorPickerFrame:GetColorAlpha() * 100
+	else
+		a = opacitySliderFrame:GetValue() -- still keeping value OpacityFrame, to coordinate with WoW settings
+		a = (1 - a) * 100 -- alpha value is reversed
+	end
 	a = math.floor(a + 0.05)
 	ColorPPBoxA:SetText(string.format("%d", a))
 	MOD:UpdateOpacityBarThumb()
