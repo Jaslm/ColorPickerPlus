@@ -2,8 +2,29 @@
   "version": "0.2",
   "language": "en-US",
   "words": [
+    "CreateColor",
+    "CreateFrame",
+    "floor",
+    "GetBuildInfo",
     "getn",
+    "ipairs",
+    "IsControlKeyDown",
+    "IsModifierKeyDown",
+    "IsMouseButtonDown",
+    "IsShiftKeyDown",
     "Jaslm",
-    "tremove"
+    "math",
+    "print",
+    "select",
+    "string",
+    "strsub",
+    "table",
+    "tonumber",
+    "tostring",
+    "tremove",
+    "tremove",
+    "UIParent",
+    "WOW_PROJECT_CLASSIC",
+    "WOW_PROJECT_ID"
   ]
 }

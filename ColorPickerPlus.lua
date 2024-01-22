@@ -219,7 +219,7 @@ function MOD:GetAlpha()
 	local a
 	local colorAlpha
 	if isDragonflight then
-		colorAlpha = ColorPickerFrame:GetColorAlpha()
+		a = ColorPickerFrame:GetColorAlpha()
 	else
 		colorAlpha = opacitySliderFrame:GetValue()
 		if ColorPickerFrame.hasOpacity then
@@ -437,7 +437,7 @@ local function OldColorOnMouseUp(frame, button)
 			ColorPickerFrame.Content.ColorPicker:SetColorRGB(r, g, b)
 			ColorPickerFrame.swatchFunc()
 			MOD:UpdateHSVfromColorPickerRGB()
-			ColorPickerFrame.Content.ColorPicker:SetColorAlpha(1 - a)
+			ColorPickerFrame.Content.ColorPicker:SetColorAlpha(a)
 		else
 			ColorPickerFrame:SetColorRGB(r, g, b)
 			ColorPickerFrame.func()
@@ -560,7 +560,7 @@ function MOD:CreateCopyPasteArea()
 			ColorPickerFrame.Content.ColorPicker:SetColorRGB(r, g, b)
 			ColorPickerFrame.swatchFunc()
 			MOD:UpdateHSVfromColorPickerRGB()
-			ColorPickerFrame.Content.ColorPicker:SetColorAlpha(1 - a)
+			ColorPickerFrame.Content.ColorPicker:SetColorAlpha(a)
 		else
 			ColorPickerFrame:SetColorRGB(r, g, b)
 			ColorPickerFrame.func()
@@ -595,7 +595,7 @@ local function PaletteSwatchOnMouseUp(frame, button)
 					ColorPickerFrame.Content.ColorPicker:SetColorRGB(r, g, b)
 					ColorPickerFrame.swatchFunc()
 					MOD:UpdateHSVfromColorPickerRGB()
-					ColorPickerFrame.Content.ColorPicker:SetColorAlpha(1 - a)
+					ColorPickerFrame.Content.ColorPicker:SetColorAlpha(a)
 				else
 					ColorPickerFrame:SetColorRGB(r, g, b)
 					ColorPickerFrame.func()
@@ -659,7 +659,7 @@ local function ClassPaletteSwatchOnMouseUp(frame, button)
 			ColorPickerFrame.Content.ColorPicker:SetColorRGB(r, g, b)
 			ColorPickerFrame.swatchFunc()
 			MOD:UpdateHSVfromColorPickerRGB()
-			ColorPickerFrame.Content.ColorPicker:SetColorAlpha(1 - a)
+			ColorPickerFrame.Content.ColorPicker:SetColorAlpha(a)
 		else
 			ColorPickerFrame:SetColorRGB(r, g, b)
 			ColorPickerFrame.func()
@@ -1470,7 +1470,7 @@ function MOD:AlphaTextChanged(textBox, userInput)
 	a = a / 100
 
 	if isDragonflight then
-		ColorPickerFrame.Content.ColorPicker:SetColorAlpha(1 - a)
+		ColorPickerFrame.Content.ColorPicker:SetColorAlpha(a)
 		ColorPickerFrame.swatchFunc()
 	else
 		opacitySliderFrame:SetValue(1 - a)
