@@ -724,10 +724,18 @@ local function GradientOnMouseDown(self, button)
 	if self:IsMouseOver() and IsMouseButtonDown(LeftButton) then
 		if not (lockedHueBar or lockedOpacityBar) then
 			lockedGradient = true
-			if ColorPickerFrame.hasOpacity then
-				lockedOpacity = 1 - (ColorPickerFrame.GetColorAlpha and ColorPickerFrame:GetColorAlpha() or opacitySliderFrame:GetValue())
+			if isDragonflight then
+				if ColorPickerFrame.hasOpacity then
+					lockedOpacity = (ColorPickerFrame.GetColorAlpha and ColorPickerFrame:GetColorAlpha() or opacitySliderFrame:GetValue())
+				else
+					lockedOpacity = 0
+				end
 			else
-				lockedOpacity = 1
+				if ColorPickerFrame.hasOpacity then
+					lockedOpacity = 1 - (ColorPickerFrame.GetColorAlpha and ColorPickerFrame:GetColorAlpha() or opacitySliderFrame:GetValue())
+				else
+					lockedOpacity = 1
+				end
 			end
 		end
 	end
@@ -842,10 +850,18 @@ local function HueBarOnMouseDown(self, button)
 	if self:IsMouseOver() and IsMouseButtonDown(LeftButton) then
 		if not (lockedGradient or lockedOpacityBar) then
 			lockedHueBar = true
-			if ColorPickerFrame.hasOpacity then
-				lockedOpacity = 1 - (ColorPickerFrame.GetColorAlpha and ColorPickerFrame:GetColorAlpha() or opacitySliderFrame:GetValue())
+			if isDragonflight then
+				if ColorPickerFrame.hasOpacity then
+					lockedOpacity = (ColorPickerFrame.GetColorAlpha and ColorPickerFrame:GetColorAlpha() or opacitySliderFrame:GetValue())
+				else
+					lockedOpacity = 0
+				end
 			else
-				lockedOpacity = 1
+				if ColorPickerFrame.hasOpacity then
+					lockedOpacity = 1 - (ColorPickerFrame.GetColorAlpha and ColorPickerFrame:GetColorAlpha() or opacitySliderFrame:GetValue())
+				else
+					lockedOpacity = 1
+				end
 			end
 			MOD:UpdateHueBarThumb()
 		end
