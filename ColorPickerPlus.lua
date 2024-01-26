@@ -216,20 +216,18 @@ function MOD:SetRGBfromHSV()
 end
 
 function MOD:GetAlpha()
-	local a
 	local colorAlpha
-	if isDragonflight then
-		a = ColorPickerFrame:GetColorAlpha()
-	else
-		colorAlpha = opacitySliderFrame:GetValue()
-		if ColorPickerFrame.hasOpacity then
-			a = 1 - colorAlpha -- blizzard values are reversed from expected transparency
+	if ColorPickerFrame.hasOpacity then
+		if isDragonflight then
+			colorAlpha = ColorPickerFrame:GetColorAlpha()
 		else
-			a = 1
+			colorAlpha = 1 - opacitySliderFrame:GetValue()
 		end
+	else
+		colorAlpha = 1
 	end
 
-	return a
+	return colorAlpha
 end
 
 function MOD:UpdateGradientColorOverlay() -- assumes color variables all set prior
@@ -725,7 +723,11 @@ local function GradientOnMouseDown(self, button)
 		if not (lockedHueBar or lockedOpacityBar) then
 			lockedGradient = true
 			if ColorPickerFrame.hasOpacity then
-				lockedOpacity = 1 - (ColorPickerFrame.GetColorAlpha and ColorPickerFrame:GetColorAlpha() or opacitySliderFrame:GetValue())
+				if isDragonflight then
+					lockedOpacity = ColorPickerFrame:GetColorAlpha()
+				else
+					lockedOpacity = 1 - opacitySliderFrame:GetValue()
+				end
 			else
 				lockedOpacity = 1
 			end
@@ -843,7 +845,11 @@ local function HueBarOnMouseDown(self, button)
 		if not (lockedGradient or lockedOpacityBar) then
 			lockedHueBar = true
 			if ColorPickerFrame.hasOpacity then
-				lockedOpacity = 1 - (ColorPickerFrame.GetColorAlpha and ColorPickerFrame:GetColorAlpha() or opacitySliderFrame:GetValue())
+				if isDragonflight then
+					lockedOpacity = ColorPickerFrame:GetColorAlpha()
+				else
+					lockedOpacity = 1 - opacitySliderFrame:GetValue()
+				end
 			else
 				lockedOpacity = 1
 			end
@@ -1486,8 +1492,7 @@ function MOD:UpdateAlphaText()
 	if isDragonflight then
 		a = ColorPickerFrame:GetColorAlpha() * 100
 	else
-		a = opacitySliderFrame:GetValue() -- still keeping value OpacityFrame, to coordinate with WoW settings
-		a = (1 - a) * 100 -- alpha value is reversed
+		a = 1 - opacitySliderFrame:GetValue() * 100 -- still keeping value OpacityFrame, to coordinate with WoW settings
 	end
 	a = math.floor(a + 0.05)
 	ColorPPBoxA:SetText(string.format("%d", a))
