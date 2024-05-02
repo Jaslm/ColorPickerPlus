@@ -1424,7 +1424,7 @@ function MOD:UpdateAlphaText()
 	if isDragonflight then
 		a = ColorPickerFrame:GetColorAlpha() * 100
 	else
-		a = 1 - opacitySliderFrame:GetValue() * 100 -- still keeping value OpacityFrame, to coordinate with WoW settings
+		a = (1 - opacitySliderFrame:GetValue()) * 100 -- still keeping value OpacityFrame, to coordinate with WoW settings
 	end
 	a = math.floor(a + 0.05)
 	ColorPPBoxA:SetText(string.format("%d", a))
