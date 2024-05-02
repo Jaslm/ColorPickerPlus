@@ -22,6 +22,8 @@ local colorHue -- 0 to 1
 local colorSat -- 0 to 1
 local colorVal -- 0 to 1
 
+local borderSize = 5
+
 local dialogWidthNoOpacity = 380
 local dialogWidthWithOpacity = 420
 local dialogHeight = 380
@@ -273,14 +275,14 @@ function MOD:UpdateGradientThumb()
 
 	-- allow for 5 pixel border around gradient, which allows user to 'grab' thumb and move it to edge of gradient
 	if rx == 0 then
-		rx = 5
-	elseif rx > gradientWidth - 5 then
-		rx = rx - 5
+		rx = borderSize
+	elseif rx > gradientWidth - borderSize then
+		rx = rx - borderSize
 	end
 	if ry == 0 then
-		ry = 5
-	elseif ry > gradientHeight - 5 then
-		ry = ry - 5
+		ry = borderSize
+	elseif ry > gradientHeight - borderSize then
+		ry = ry - borderSize
 	end
 	ColorPPColorGradientThumb:SetPoint("CENTER", ColorPPGradient, "BOTTOMLEFT", rx, ry)
 end
@@ -347,7 +349,6 @@ end
 
 function MOD:CleanUpColorPickerFrame()
 	-- First, disable some standard Blizzard components
-
 	if isModern then
 		ColorPickerFrame:Hide()
 		ColorPickerFrame.Content:Hide()
@@ -522,16 +523,16 @@ function MOD:CreateCopyPasteArea()
 	--	t:Show()
 
 	-- add copy button
-	local b = CreateFrame("Button", "ColorPPCopy", fr, "UIPanelButtonTemplate")
-	b:SetText("<-- Copy")
-	b:SetWidth(80)
-	b:SetHeight(22)
-	b:SetScale(0.80)
-	b:SetPoint("TOP", "ColorPPCopiedColor", "TOP", 0, -20)
-	b:SetPoint("RIGHT", "ColorPPCopyPasteArea", "RIGHT", 0, 0)
+	local copyButton = CreateFrame("Button", "ColorPPCopy", fr, "UIPanelButtonTemplate")
+	copyButton:SetText("<-- Copy")
+	copyButton:SetWidth(80)
+	copyButton:SetHeight(22)
+	copyButton:SetScale(0.80)
+	copyButton:SetPoint("TOP", "ColorPPCopiedColor", "TOP", 0, -20)
+	copyButton:SetPoint("RIGHT", "ColorPPCopyPasteArea", "RIGHT", 0, 0)
 
 	-- copy color into buffer on button click
-	b:SetScript("OnClick", function(self)
+	copyButton:SetScript("OnClick", function(self)
 		-- copy current dialog colors into buffer
 		local r, g, b = ColorPickerFrame:GetColorRGB()
 		local a = MOD:GetAlpha()
@@ -541,20 +542,19 @@ function MOD:CreateCopyPasteArea()
 	end)
 
 	-- add paste button to the ColorPickerFrame
-	b = CreateFrame("Button", "ColorPPPaste", fr, "UIPanelButtonTemplate")
-	b:SetText("Paste -->")
-	b:SetWidth(80)
-	b:SetHeight(22)
-	b:SetScale(0.8)
-	b:SetPoint("TOPRIGHT", "ColorPPCopy", "BOTTOMRIGHT", 0, -10)
-	b:Disable() -- enable when something has been copied
+	pasteButton = CreateFrame("Button", "ColorPPPaste", fr, "UIPanelButtonTemplate")
+	pasteButton:SetText("Paste -->")
+	pasteButton:SetWidth(80)
+	pasteButton:SetHeight(22)
+	pasteButton:SetScale(0.8)
+	pasteButton:SetPoint("TOPRIGHT", "ColorPPCopy", "BOTTOMRIGHT", 0, -10)
+	pasteButton:Disable() -- enable when something has been copied
 
 	-- paste color on button click, updating frame components
-	b:SetScript("OnClick", function(self)
+	pasteButton:SetScript("OnClick", function(self)
 		local r, g, b, a = ColorPPCopiedColor:GetBackdropColor()
 
 		-- update color and opacity variables
-
 		if isModern then
 			ColorPickerFrame.Content.ColorPicker:SetColorRGB(r, g, b)
 			ColorPickerFrame.swatchFunc()
@@ -743,15 +743,13 @@ local function GradientOnUpdate(self)
 		end
 
 		if lockedGradient then -- begin to track motion, until button release
-			local brightness, saturation
-
 			-- Get the bounds of the frame and account for any Scale settings
 			-- note that position is within 5 pixel border on each side
 			local scale = ColorPickerFrame:GetScale() -- We inherit scale from our "parent" the ColorPickerFrame
-			local top = (self:GetTop() * scale) + 5
-			local bottom = (self:GetBottom() * scale) - 5
-			local left = (self:GetLeft() * scale) + 5
-			local right = (self:GetRight()) * scale - 5
+			local top = (self:GetTop() * scale) + borderSize
+			local bottom = (self:GetBottom() * scale) - borderSize
+			local left = (self:GetLeft() * scale) + borderSize
+			local right = (self:GetRight()) * scale - borderSize
 			local height = top - bottom
 			local width = right - left
 
@@ -1120,24 +1118,24 @@ function MOD:CreateTextBoxes()
 	ColorPPBoxA:SetPoint("TOP", ColorPPBoxR, "TOP")
 
 	-- define the order of tab cursor movement
-	ColorPPBoxR:SetScript("OnTabPressed", function(self)
+	ColorPPBoxR:SetScript("OnTabPressed", function()
 		ColorPPBoxG:SetFocus()
 	end)
-	ColorPPBoxG:SetScript("OnTabPressed", function(self)
+	ColorPPBoxG:SetScript("OnTabPressed", function()
 		ColorPPBoxB:SetFocus()
 	end)
-	ColorPPBoxB:SetScript("OnTabPressed", function(self)
+	ColorPPBoxB:SetScript("OnTabPressed", function()
 		ColorPPBoxR:SetFocus()
 	end)
 
 	-- define the order of tab cursor movement
-	ColorPPBoxH:SetScript("OnTabPressed", function(self)
+	ColorPPBoxH:SetScript("OnTabPressed", function()
 		ColorPPBoxS:SetFocus()
 	end)
-	ColorPPBoxS:SetScript("OnTabPressed", function(self)
+	ColorPPBoxS:SetScript("OnTabPressed", function()
 		ColorPPBoxV:SetFocus()
 	end)
-	ColorPPBoxV:SetScript("OnTabPressed", function(self)
+	ColorPPBoxV:SetScript("OnTabPressed", function()
 		ColorPPBoxH:SetFocus()
 	end)
 end
@@ -1253,7 +1251,7 @@ function MOD.PLAYER_LOGIN()
 	ColorPickerFrame:HookScript("OnShow", function(...)
 		MOD:Hooked_OnShow(...)
 	end)
-	ColorPickerFrame:UnregisterEvent("PLAYER_LOGIN") --so initialization only happens once
+	ColorPickerFrame:UnregisterEvent("PLAYER_LOGIN") -- so initialization only happens once
 end
 
 function MOD:RGBTextChanged(textBox, userInput)
