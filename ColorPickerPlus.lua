@@ -44,8 +44,9 @@ local colorSwatchWidth = 120
 local colorSwatchHeight = 120
 
 local isClassic = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC)
-local isWrath = (WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC)
+local isCata = (WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC)
 local isDragonflight = floor(select(4, GetBuildInfo()) / 10000) == 10
+local isModern = isCata or isDragonflight
 
 local opacitySliderFrame = OpacityFrameSlider and OpacityFrameSlider or OpacitySliderFrame
 
@@ -124,7 +125,7 @@ if isClassic then
 	tremove(classColorPalette, 4) -- Evoker
 	tremove(classColorPalette, 2) -- Demon Hunter
 	tremove(classColorPalette, 1) -- Death Knight
-elseif isWrath then
+elseif isCata then
 	tremove(classColorPalette, 7) -- Monk
 	tremove(classColorPalette, 4) -- Evoker
 	tremove(classColorPalette, 2) -- Demon Hunter
@@ -207,8 +208,9 @@ end
 function MOD:UpdateHSVfromColorPickerRGB()
 	colorHue, colorSat, colorVal = RGB_to_HSV(ColorPickerFrame:GetColorRGB())
 end
+
 function MOD:SetRGBfromHSV()
-	if isDragonflight then
+	if isModern then
 		ColorPickerFrame.Content.ColorPicker:SetColorRGB(HSV_to_RGB(colorHue, colorSat, colorVal))
 	else
 		ColorPickerFrame:SetColorRGB(HSV_to_RGB(colorHue, colorSat, colorVal))
@@ -218,7 +220,7 @@ end
 function MOD:GetAlpha()
 	local colorAlpha
 	if ColorPickerFrame.hasOpacity then
-		if isDragonflight then
+		if isModern then
 			colorAlpha = ColorPickerFrame:GetColorAlpha()
 		else
 			colorAlpha = 1 - opacitySliderFrame:GetValue()
@@ -285,7 +287,7 @@ end
 
 function MOD:UpdateOpacityBarThumb()
 	local a
-	if isDragonflight then
+	if isModern then
 		a = ColorPickerFrame:GetColorAlpha()
 	else
 		a = opacitySliderFrame:GetValue()
@@ -346,7 +348,7 @@ end
 function MOD:CleanUpColorPickerFrame()
 	-- First, disable some standard Blizzard components
 
-	if isDragonflight then
+	if isModern then
 		ColorPickerFrame:Hide()
 		ColorPickerFrame.Content:Hide()
 		ColorPickerFrame.Content.ColorPicker:Hide()
@@ -374,7 +376,7 @@ function MOD:CleanUpColorPickerFrame()
 	end
 
 	-- Add the "Color Picker Plus" dialog title
-	if isClassic or isWrath then
+	if isClassic then
 		local t = ColorPickerFrame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
 		t:SetFontObject("GameFontNormal")
 		t:SetText("Color Picker Plus")
@@ -413,7 +415,7 @@ function MOD:CleanUpColorPickerFrame()
 end
 
 function MOD:CreateCheckerboardBG(fr, dense, w, h)
-	local t = fr:CreateTexture("ColorPPCheckerboard")
+	local t = fr:CreateTexture("ColorPPCheckerboard", "BACKGROUND", nil, -3)
 	t:SetSize(w, h)
 	if dense then
 		t:SetTexture("Interface\\AddOns\\ColorPickerPlus\\media\\checkerboard16")
@@ -421,7 +423,6 @@ function MOD:CreateCheckerboardBG(fr, dense, w, h)
 		t:SetTexture("Interface\\AddOns\\ColorPickerPlus\\media\\checkerboard8")
 	end
 	t:SetPoint("TOPLEFT", fr, "TOPLEFT", 0, 0)
-	t:SetDrawLayer("Background", -3)
 	return t
 end
 
@@ -431,7 +432,7 @@ local function OldColorOnMouseUp(frame, button)
 		local r, g, b, a = frame:GetBackdropColor()
 
 		-- update color and opacity variables
-		if isDragonflight then
+		if isModern then
 			ColorPickerFrame.Content.ColorPicker:SetColorRGB(r, g, b)
 			ColorPickerFrame.swatchFunc()
 			MOD:UpdateHSVfromColorPickerRGB()
@@ -554,7 +555,7 @@ function MOD:CreateCopyPasteArea()
 
 		-- update color and opacity variables
 
-		if isDragonflight then
+		if isModern then
 			ColorPickerFrame.Content.ColorPicker:SetColorRGB(r, g, b)
 			ColorPickerFrame.swatchFunc()
 			MOD:UpdateHSVfromColorPickerRGB()
@@ -589,7 +590,7 @@ local function PaletteSwatchOnMouseUp(frame, button)
 			else -- Set the chosen color to the swatch color
 				r, g, b, a = frame:GetBackdropColor()
 
-				if isDragonflight then
+				if isModern then
 					ColorPickerFrame.Content.ColorPicker:SetColorRGB(r, g, b)
 					ColorPickerFrame.swatchFunc()
 					MOD:UpdateHSVfromColorPickerRGB()
@@ -653,7 +654,7 @@ local function ClassPaletteSwatchOnMouseUp(frame, button)
 		-- Set the chosen color to the swatch color
 		r, g, b, a = frame:GetBackdropColor()
 
-		if isDragonflight then
+		if isModern then
 			ColorPickerFrame.Content.ColorPicker:SetColorRGB(r, g, b)
 			ColorPickerFrame.swatchFunc()
 			MOD:UpdateHSVfromColorPickerRGB()
@@ -672,7 +673,7 @@ local function ClassPaletteSwatchOnMouseUp(frame, button)
 end
 
 function MOD:CreateClassPalette()
-	local rows = isDragonflight and 4 or 3
+	local rows = isModern and 4 or 3
 	local cols = 4
 	local spacer = 2
 	local margin = 0
@@ -723,7 +724,7 @@ local function GradientOnMouseDown(self, button)
 		if not (lockedHueBar or lockedOpacityBar) then
 			lockedGradient = true
 			if ColorPickerFrame.hasOpacity then
-				if isDragonflight then
+				if isModern then
 					lockedOpacity = ColorPickerFrame:GetColorAlpha()
 				else
 					lockedOpacity = 1 - opacitySliderFrame:GetValue()
@@ -787,7 +788,7 @@ local function GradientOnUpdate(self)
 
 			local r, g, b = HSV_to_RGB(colorHue, colorSat, colorVal)
 
-			if isDragonflight then
+			if isModern then
 				ColorPickerFrame.Content.ColorPicker:SetColorRGB(r, g, b)
 				ColorPickerFrame.swatchFunc()
 			else
@@ -822,17 +823,15 @@ function MOD:CreateColorGradient() -- allows selection of saturation/value
 	t:Show()
 
 	-- add Color Overlay
-	t = f:CreateTexture("ColorPPColorOverlay")
+	t = f:CreateTexture("ColorPPColorOverlay", "OVERLAY", nil, 0)
 	t:SetSize(gradientWidth - 10, gradientHeight - 10)
-	t:SetDrawLayer("OVERLAY", 0)
 	t:SetTexture("Interface\\AddOns\\ColorPickerPlus\\media\\color_overlay")
 	t:SetPoint("CENTER", ColorPPGradient, "CENTER", 0, 0)
 	t:Show()
 
 	-- add gradient thumb texture
-	t = f:CreateTexture("ColorPPColorGradientThumb")
+	t = f:CreateTexture("ColorPPColorGradientThumb", "OVERLAY", nil, 1)
 	t:SetSize(10, 10)
-	t:SetDrawLayer("OVERLAY", 1)
 	--t:SetTexture("Interface\\AddOns\\ColorPickerPlus\\media\\cursor2")
 	t:SetTexture("Interface\\Buttons\\UI-ColorPicker-Buttons")
 	t:SetTexCoord(0, 0.15625, 0, 0.625)
@@ -845,7 +844,7 @@ local function HueBarOnMouseDown(self, button)
 		if not (lockedGradient or lockedOpacityBar) then
 			lockedHueBar = true
 			if ColorPickerFrame.hasOpacity then
-				if isDragonflight then
+				if isModern then
 					lockedOpacity = ColorPickerFrame:GetColorAlpha()
 				else
 					lockedOpacity = 1 - opacitySliderFrame:GetValue()
@@ -890,7 +889,7 @@ local function HueBarOnUpdate(self) -- it's actually the holder that receives th
 			end
 
 			local r, g, b = HSV_to_RGB(colorHue, colorSat, colorVal)
-			if isDragonflight then
+			if isModern then
 				ColorPickerFrame.Content.ColorPicker:SetColorRGB(r, g, b)
 				ColorPickerFrame.swatchFunc()
 			else
@@ -947,7 +946,6 @@ function MOD:CreateHueBar()
 	-- Thumb indicates value position on the slider
 	local thumb = f:CreateTexture("ColorPPHueBarThumb", "OVERLAY")
 	thumb:SetTexture("Interface\\AddOns\\ColorPickerPlus\\Media\\SliderVBar.tga")
-	thumb:SetDrawLayer("OVERLAY")
 	thumb:SetSize(hueBarWidth + 6, 8)
 end
 
@@ -989,7 +987,7 @@ local function OpacityBarOnUpdate(self)
 				a = 1 - ((top - y) / height)
 			end
 
-			if isDragonflight then
+			if isModern then
 				ColorPickerFrame.Content.ColorPicker:SetColorAlpha(a)
 				MOD:UpdateAlphaText()
 				local r, g, b = ColorPickerFrame:GetColorRGB()
@@ -1018,7 +1016,7 @@ function MOD:CreateOpacityBar()
 	f:SetScript("OnUpdate", OpacityBarOnUpdate)
 	f:SetScript("OnMouseDown", OpacityBarOnMouseDown)
 
-	local t = f:CreateTexture("ColorPPOpacityBarBG", "OVERLAY") --f)
+	local t = f:CreateTexture("ColorPPOpacityBarBG", "OVERLAY")
 	t:SetPoint("TOP", ColorPPOpacityBar, "TOP", 0, 0)
 	t:SetSize(opacityBarWidth, opacityBarHeight)
 	t:SetVertexColor(1.0, 1.0, 1.0, 1.0)
@@ -1026,10 +1024,9 @@ function MOD:CreateOpacityBar()
 	t:SetGradient("VERTICAL", CreateColor(1, 1, 1, 1), CreateColor(0, 0, 0, 1))
 
 	-- Thumb indicates value position on the slider
-	local thumb = f:CreateTexture("ColorPPOpacityBarThumb", "OVERLAY") --f)
+	local thumb = f:CreateTexture("ColorPPOpacityBarThumb", "OVERLAY", nil, 4)
 	thumb:SetTexture("Interface\\AddOns\\ColorPickerPlus\\Media\\SliderVBar.tga")
 	thumb:SetSize(opacityBarWidth + 6, 8)
-	thumb:SetDrawLayer("OVERLAY", 4)
 	thumb:SetPoint("CENTER", f, "CENTER", 0, 0)
 
 	f:ClearAllPoints()
@@ -1245,17 +1242,17 @@ function MOD:Initialize_UI()
 	MOD:CreateColorSwatches()
 	MOD:CreateHelpFrame()
 	MOD:CreatePaletteSwitcher()
-	if isDragonflight then
+	if isModern then
 		ColorPickerFrame.Footer.CancelButton:SetSize(100, 22)
 		ColorPickerFrame.Footer.OkayButton:SetSize(100, 22)
 	end
 end
 
 function MOD.PLAYER_LOGIN()
+	MOD:Initialize_UI()
 	ColorPickerFrame:HookScript("OnShow", function(...)
 		MOD:Hooked_OnShow(...)
 	end)
-	MOD:Initialize_UI()
 	ColorPickerFrame:UnregisterEvent("PLAYER_LOGIN") --so initialization only happens once
 end
 
@@ -1302,7 +1299,7 @@ function MOD:RGBTextChanged(textBox, userInput)
 		return
 	end
 
-	if isDragonflight then
+	if isModern then
 		ColorPickerFrame.Content.ColorPicker:SetColorRGB(r, g, b)
 		ColorPickerFrame.swatchFunc()
 	else
@@ -1346,7 +1343,7 @@ function MOD:HexTextChanged(textBox, userInput)
 		return
 	end
 
-	if isDragonflight then
+	if isModern then
 		ColorPickerFrame.Content.ColorPicker:SetColorRGB(r, g, b)
 		ColorPickerFrame.swatchFunc()
 	else
@@ -1405,7 +1402,7 @@ function MOD:HSVTextChanged(textBox, userInput)
 	colorHue, colorSat, colorVal = h, s, v
 	local r, g, b = HSV_to_RGB(h, s, v)
 
-	if isDragonflight then
+	if isModern then
 		ColorPickerFrame.Content.ColorPicker:SetColorRGB(r, g, b)
 		ColorPickerFrame.swatchFunc()
 	else
@@ -1475,7 +1472,7 @@ function MOD:AlphaTextChanged(textBox, userInput)
 	end
 	a = a / 100
 
-	if isDragonflight then
+	if isModern then
 		ColorPickerFrame.Content.ColorPicker:SetColorAlpha(a)
 		ColorPickerFrame.swatchFunc()
 	else
@@ -1489,7 +1486,7 @@ end
 
 function MOD:UpdateAlphaText()
 	local a
-	if isDragonflight then
+	if isModern then
 		a = ColorPickerFrame:GetColorAlpha() * 100
 	else
 		a = 1 - opacitySliderFrame:GetValue() * 100 -- still keeping value OpacityFrame, to coordinate with WoW settings

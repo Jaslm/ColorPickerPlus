@@ -1,6 +1,7 @@
 {
     "runtime.version": "Lua 5.1",
     "diagnostics.globals": [
+        "CreateFrame",
         "ColorPickerFrame",
         "ColorPickerWheel",
         "ColorSwatch",
@@ -35,6 +36,14 @@
         "ColorPPGradient",
         "ColorPickerFrameHeader",
         "LeftButton",
-        "ColorPPGradientTexture"
+        "ColorPPGradientTexture",
+        "WOW_PROJECT_ID",
+        "WOW_PROJECT_CLASSIC",
+        "WOW_PROJECT_CATACLYSM_CLASSIC",
+        "IsModifierKeyDown",
+        "IsShiftKeyDown",
+        "IsMouseButtonDown",
+        "UIParent",
+        "CreateColor"
     ]
 }
