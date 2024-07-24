@@ -47,7 +47,7 @@ local colorSwatchHeight = 120
 
 local isClassic = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC)
 local isCata = (WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC)
-local isDragonflight = floor(select(4, GetBuildInfo()) / 10000) == 10
+local isTWW = floor(select(4, GetBuildInfo()) / 11000) == 10
 
 local opacitySliderFrame = OpacitySliderFrame and OpacitySliderFrame or OpacityFrameSlider
 
@@ -207,7 +207,7 @@ local function HSV_to_RGB(ch, cs, cv)
 end
 
 function MOD:SetColor(r, g, b)
-	if isDragonflight then
+	if isTWW then
 		ColorPickerFrame.Content.ColorPicker:SetColorRGB(r, g, b)
 	else
 		ColorPickerFrame:SetColorRGB(r, g, b)
@@ -217,7 +217,7 @@ function MOD:SetColor(r, g, b)
 end
 
 function MOD:SetAlpha(a)
-	if isDragonflight then
+	if isTWW then
 		ColorPickerFrame.Content.ColorPicker:SetColorAlpha(a)
 	else
 		opacitySliderFrame:SetValue(1 - a)
@@ -229,7 +229,7 @@ function MOD:UpdateHSVfromColorPickerRGB()
 end
 
 function MOD:SetRGBfromHSV()
-	if isDragonflight then
+	if isTWW then
 		ColorPickerFrame.Content.ColorPicker:SetColorRGB(HSV_to_RGB(colorHue, colorSat, colorVal))
 	else
 		ColorPickerFrame:SetColorRGB(HSV_to_RGB(colorHue, colorSat, colorVal))
@@ -239,7 +239,7 @@ end
 function MOD:GetAlpha()
 	local colorAlpha
 	if ColorPickerFrame.hasOpacity then
-		if isDragonflight then
+		if isTWW then
 			colorAlpha = ColorPickerFrame:GetColorAlpha()
 		else
 			colorAlpha = 1 - opacitySliderFrame:GetValue()
@@ -306,7 +306,7 @@ end
 
 function MOD:UpdateOpacityBarThumb()
 	local a
-	if isDragonflight then
+	if isTWW then
 		a = ColorPickerFrame:GetColorAlpha()
 	else
 		a = opacitySliderFrame:GetValue()
@@ -367,7 +367,7 @@ end
 function MOD:CleanUpColorPickerFrame()
 	-- First, disable some standard Blizzard components
 
-	if isDragonflight then
+	if isTWW then
 		ColorPickerFrame:Hide()
 		ColorPickerFrame.Content:Hide()
 		ColorPickerFrame.Content.ColorPicker:Hide()
@@ -651,7 +651,7 @@ local function ClassPaletteSwatchOnMouseUp(frame, button)
 end
 
 function MOD:CreateClassPalette()
-	local rows = isDragonflight and 4 or 3
+	local rows = isTWW and 4 or 3
 	local cols = 4
 	local spacer = 2
 	local margin = 0
@@ -702,7 +702,7 @@ local function GradientOnMouseDown(self, button)
 		if not (lockedHueBar or lockedOpacityBar) then
 			lockedGradient = true
 			if ColorPickerFrame.hasOpacity then
-				if isDragonflight then
+				if isTWW then
 					lockedOpacity = ColorPickerFrame:GetColorAlpha()
 				else
 					lockedOpacity = 1 - opacitySliderFrame:GetValue()
@@ -813,7 +813,7 @@ local function HueBarOnMouseDown(self, button)
 		if not (lockedGradient or lockedOpacityBar) then
 			lockedHueBar = true
 			if ColorPickerFrame.hasOpacity then
-				if isDragonflight then
+				if isTWW then
 					lockedOpacity = ColorPickerFrame:GetColorAlpha()
 				else
 					lockedOpacity = 1 - opacitySliderFrame:GetValue()
@@ -950,7 +950,7 @@ local function OpacityBarOnUpdate(self)
 				a = 1 - ((top - y) / height)
 			end
 
-			if isDragonflight then
+			if isTWW then
 				ColorPickerFrame.Content.ColorPicker:SetColorAlpha(a)
 				MOD:UpdateAlphaText()
 				local r, g, b = ColorPickerFrame:GetColorRGB()
@@ -1205,7 +1205,7 @@ function MOD:Initialize_UI()
 	MOD:CreateColorSwatches()
 	MOD:CreateHelpFrame()
 	MOD:CreatePaletteSwitcher()
-	if isDragonflight then
+	if isTWW then
 		ColorPickerFrame.Footer.CancelButton:SetSize(100, 22)
 		ColorPickerFrame.Footer.OkayButton:SetSize(100, 22)
 	end
@@ -1421,7 +1421,7 @@ end
 
 function MOD:UpdateAlphaText()
 	local a
-	if isDragonflight then
+	if isTWW then
 		a = ColorPickerFrame:GetColorAlpha() * 100
 	else
 		a = (1 - opacitySliderFrame:GetValue()) * 100 -- still keeping value OpacityFrame, to coordinate with WoW settings
