@@ -46,7 +46,7 @@ local colorSwatchWidth = 120
 local colorSwatchHeight = 120
 
 local isClassic = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC)
-local isCata = (WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC)
+local isCata = (WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC or WOW_PROJECT_ID == 19)
 local isTWW = floor(select(4, GetBuildInfo()) / 11000) == 10
 
 local opacitySliderFrame = OpacitySliderFrame and OpacitySliderFrame or OpacityFrameSlider
