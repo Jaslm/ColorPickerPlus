@@ -46,6 +46,7 @@ local colorSwatchWidth = 120
 local colorSwatchHeight = 120
 
 local isClassic = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC)
+local isTBC = (WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC)
 local isCata = (WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC or WOW_PROJECT_ID == 19)
 local isTWW = floor(select(4, GetBuildInfo()) / 11000) == 10
 
@@ -121,7 +122,7 @@ local classColorPalette = {
 	{ r = 0.78, g = 0.61, b = 0.43, a = 1.0 }, -- Warrior Tan
 }
 
-if isClassic then
+if isClassic or isTBC then
 	tremove(classColorPalette, 7) -- Monk
 	tremove(classColorPalette, 4) -- Evoker
 	tremove(classColorPalette, 2) -- Demon Hunter
@@ -395,7 +396,7 @@ function MOD:CleanUpColorPickerFrame()
 	end
 
 	-- Add the "Color Picker Plus" dialog title
-	if isClassic or isCata then
+	if isClassic or isTBC or isCata then
 		local t = ColorPickerFrame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
 		t:SetFontObject("GameFontNormal")
 		t:SetText("Color Picker Plus")
