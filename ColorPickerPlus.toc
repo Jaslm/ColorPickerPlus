@@ -1,4 +1,4 @@
-## Interface: 110000, 110002
+## Interface: 120000, 120001
 ## Title: ColorPickerPlus
 ## Notes: Hooks into the standard Color Picker to provide text entry for colors (RGB and hex values), starting color and chosen color swatches
 ## Author: jaslm
@@ -8,3 +8,4 @@
 ## X-Wago-ID: aNDmE46o
 
 ColorPickerPlus.lua
+
